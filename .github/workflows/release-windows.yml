@@ -55,12 +55,18 @@ jobs:
           "RELEASE_SKIPPED=$($tests.numPendingTests)" | Add-Content $env:GITHUB_ENV
           $build = Get-Content artifacts/BUILD.json -Raw | ConvertFrom-Json
           if ($build.sourceSha -ne $run.head_sha -or "$($build.runId)" -ne $env:VALIDATED_RUN) { throw 'Artifact provenance mismatch' }
+          $releaseChecksums = @()
           foreach ($line in Get-Content artifacts/SHA256SUMS.txt) {
             $parts = $line -split '  ', 2
             if ($parts.Count -ne 2 -or [IO.Path]::GetFileName($parts[1]) -ne $parts[1]) { throw 'Invalid checksum entry' }
             $actual = (Get-FileHash -LiteralPath (Join-Path artifacts $parts[1]) -Algorithm SHA256).Hash
             if ($actual -ne $parts[0]) { throw "Checksum mismatch: $($parts[1])" }
+            $releaseChecksums += '{0}  {1}' -f $actual.ToLowerInvariant(), $parts[1].Replace(' ', '.')
           }
+          # GitHub normalizes asset-name spaces to dots. Match the published names.
+          Get-ChildItem artifacts -File | Where-Object { $_.Name.Contains(' ') } |
+            Rename-Item -NewName { $_.Name.Replace(' ', '.') }
+          $releaseChecksums | Set-Content artifacts/SHA256SUMS.txt -Encoding ascii
           Copy-Item evidence/english-window/before-window.png artifacts/before.png
           Copy-Item evidence/english-window/after-window.png artifacts/after.png
           Copy-Item evidence/english-window/evidence.json artifacts/UI-VERIFICATION.json
