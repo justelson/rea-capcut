@@ -214,7 +214,7 @@ function title(
 
 export async function generateDemo(directory = path.resolve(".demo")) {
   await mkdir(directory, { recursive: true });
-  const names = ["晨光山谷", "青蓝湖泊", "暮色微光"];
+  const names = ["Morning Valley", "Blue Lake", "Twilight Glow"];
   const images: string[] = [];
   const videos: string[] = [];
   for (let index = 0; index < 3; index++) {
@@ -245,7 +245,7 @@ export async function generateDemo(directory = path.resolve(".demo")) {
     ]);
     videos.push(video);
   }
-  const audio = path.join(directory, "环境和弦.wav");
+  const audio = path.join(directory, "Ambient Chords.wav");
   await runMediaTool("ffmpeg", [
     "-v",
     "error",
@@ -268,22 +268,22 @@ export async function generateDemo(directory = path.resolve(".demo")) {
   assets.slice(3, 6).forEach((asset) => {
     asset.thumbnail = asset.url;
   });
-  const project = createProject("山海之间 · 原创演示");
+  const project = createProject("Between Mountains and Sea · Original Demo");
   project.width = WIDTH;
   project.height = HEIGHT;
   project.fps = FPS;
   project.background = "#0c1d2b";
   project.assets = assets;
-  const captions = createTrack("text", "字幕 · 情绪与节奏");
+  const captions = createTrack("text", "Captions · Mood and Rhythm");
   project.tracks.splice(1, 0, captions);
   const titleTrack = project.tracks[0].id;
   const videoTrack = project.tracks[2].id;
   const audioTrack = project.tracks[3].id;
-  const headers = ["山海之间", "循光而行", "把时间留给自己"];
+  const headers = ["Between Mountains and Sea", "Follow the Light", "Make Time for Yourself"];
   const subtitles = [
-    "每一帧，都从本地开始",
-    "自由剪辑，自由表达",
-    "慢一点，看见更多",
+    "Every frame begins locally",
+    "Edit freely. Express freely.",
+    "Slow down and see more.",
   ];
   const labels = [
     "01  /  MORNING LIGHT",
@@ -394,7 +394,7 @@ export async function generateDemo(directory = path.resolve(".demo")) {
     Math.abs(Number(probe.format.duration) - 9) > 0.1 ||
     !probe.streams.some((stream) => stream.codec_type === "audio")
   )
-    throw new Error("示例视频验证失败");
+    throw new Error("Demo video validation failed");
   for (const [index, second] of [1.5, 4.5, 7.5].entries())
     await runMediaTool("ffmpeg", [
       "-v",

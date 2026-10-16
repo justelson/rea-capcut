@@ -4,7 +4,7 @@
   "assets": [
     {
       "id": "sparkle",
-      "name": "四角星光",
+      "name": "Four-point sparkle",
       "category": "stickers",
       "kind": "image",
       "fileName": "sparkle.png",
@@ -12,8 +12,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "星星",
-        "闪耀",
+        "star",
+        "shine",
         "sparkle"
       ],
       "transparent": true,
@@ -24,7 +24,7 @@
     },
     {
       "id": "burst",
-      "name": "活力爆炸贴",
+      "name": "Energy burst",
       "category": "stickers",
       "kind": "image",
       "fileName": "burst.png",
@@ -32,8 +32,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "爆炸",
-        "强调",
+        "burst",
+        "emphasis",
         "burst"
       ],
       "transparent": true,
@@ -44,7 +44,7 @@
     },
     {
       "id": "heart",
-      "name": "珊瑚爱心",
+      "name": "Coral heart",
       "category": "stickers",
       "kind": "image",
       "fileName": "heart.png",
@@ -52,8 +52,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "爱心",
-        "喜欢",
+        "heart",
+        "like",
         "heart"
       ],
       "transparent": true,
@@ -64,7 +64,7 @@
     },
     {
       "id": "arrow-curved",
-      "name": "手绘转弯箭头",
+      "name": "Hand-drawn curved arrow",
       "category": "stickers",
       "kind": "image",
       "fileName": "arrow-curved.png",
@@ -72,8 +72,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "箭头",
-        "指引",
+        "arrow",
+        "direction",
         "arrow"
       ],
       "transparent": true,
@@ -84,7 +84,7 @@
     },
     {
       "id": "arrow-left",
-      "name": "向左倒带",
+      "name": "Rewind arrow",
       "category": "stickers",
       "kind": "image",
       "fileName": "arrow-left.png",
@@ -92,8 +92,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "倒带",
-        "箭头",
+        "rewind",
+        "arrow",
         "reverse"
       ],
       "transparent": true,
@@ -104,7 +104,7 @@
     },
     {
       "id": "play",
-      "name": "薄荷播放键",
+      "name": "Mint play button",
       "category": "stickers",
       "kind": "image",
       "fileName": "play.png",
@@ -112,8 +112,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "播放",
-        "视频",
+        "play",
+        "video",
         "play"
       ],
       "transparent": true,
@@ -124,7 +124,7 @@
     },
     {
       "id": "check",
-      "name": "完成勾选",
+      "name": "Check mark",
       "category": "stickers",
       "kind": "image",
       "fileName": "check.png",
@@ -132,8 +132,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "成功",
-        "完成",
+        "success",
+        "complete",
         "check"
       ],
       "transparent": true,
@@ -144,7 +144,7 @@
     },
     {
       "id": "pin",
-      "name": "旅行定位",
+      "name": "Travel pin",
       "category": "stickers",
       "kind": "image",
       "fileName": "pin.png",
@@ -152,8 +152,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "旅行",
-        "位置",
+        "travel",
+        "location",
         "pin"
       ],
       "transparent": true,
@@ -164,7 +164,7 @@
     },
     {
       "id": "speech",
-      "name": "对话气泡",
+      "name": "Speech bubble",
       "category": "stickers",
       "kind": "image",
       "fileName": "speech.png",
@@ -172,8 +172,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "对话",
-        "文字",
+        "chat",
+        "text",
         "speech"
       ],
       "transparent": true,
@@ -184,7 +184,7 @@
     },
     {
       "id": "quote",
-      "name": "引用符号",
+      "name": "Quote marks",
       "category": "stickers",
       "kind": "image",
       "fileName": "quote.png",
@@ -192,8 +192,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "采访",
-        "引用",
+        "interview",
+        "quote",
         "quote"
       ],
       "transparent": true,
@@ -204,7 +204,7 @@
     },
     {
       "id": "film",
-      "name": "迷你胶片",
+      "name": "Mini film strip",
       "category": "stickers",
       "kind": "image",
       "fileName": "film.png",
@@ -212,8 +212,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "电影",
-        "胶片",
+        "movie",
+        "film",
         "film"
       ],
       "transparent": true,
@@ -224,7 +224,7 @@
     },
     {
       "id": "clap",
-      "name": "开拍场记板",
+      "name": "Movie clapperboard",
       "category": "stickers",
       "kind": "image",
       "fileName": "clap.png",
@@ -232,8 +232,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "场记",
-        "电影",
+        "clapperboard",
+        "movie",
         "clap"
       ],
       "transparent": true,
@@ -244,7 +244,7 @@
     },
     {
       "id": "sun",
-      "name": "日光小太阳",
+      "name": "Little sunshine",
       "category": "stickers",
       "kind": "image",
       "fileName": "sun.png",
@@ -252,8 +252,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "天气",
-        "阳光",
+        "weather",
+        "sunshine",
         "sun"
       ],
       "transparent": true,
@@ -264,7 +264,7 @@
     },
     {
       "id": "rainbow",
-      "name": "柔彩彩虹",
+      "name": "Soft rainbow",
       "category": "stickers",
       "kind": "image",
       "fileName": "rainbow.png",
@@ -272,8 +272,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "彩虹",
-        "生活",
+        "rainbow",
+        "life",
         "rainbow"
       ],
       "transparent": true,
@@ -284,7 +284,7 @@
     },
     {
       "id": "confetti",
-      "name": "庆祝纸屑",
+      "name": "Celebration confetti",
       "category": "stickers",
       "kind": "image",
       "fileName": "confetti.png",
@@ -292,8 +292,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "庆祝",
-        "节日",
+        "celebration",
+        "holiday",
         "confetti"
       ],
       "transparent": true,
@@ -304,7 +304,7 @@
     },
     {
       "id": "focus",
-      "name": "取景框",
+      "name": "Viewfinder",
       "category": "stickers",
       "kind": "image",
       "fileName": "focus.png",
@@ -312,8 +312,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "镜头",
-        "对焦",
+        "lens",
+        "focus",
         "focus"
       ],
       "transparent": true,
@@ -324,7 +324,7 @@
     },
     {
       "id": "bg-midnight",
-      "name": "午夜渐层",
+      "name": "Midnight gradient",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-midnight.png",
@@ -332,8 +332,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "深蓝",
-        "渐变",
+        "navy",
+        "gradient",
         "dark"
       ],
       "transparent": false,
@@ -344,7 +344,7 @@
     },
     {
       "id": "bg-sunrise",
-      "name": "日出珊瑚",
+      "name": "Coral sunrise",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-sunrise.png",
@@ -352,8 +352,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "暖色",
-        "渐变",
+        "warm",
+        "gradient",
         "warm"
       ],
       "transparent": false,
@@ -364,7 +364,7 @@
     },
     {
       "id": "bg-mint",
-      "name": "薄荷流光",
+      "name": "Mint glow",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-mint.png",
@@ -372,8 +372,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "清新",
-        "绿色",
+        "fresh",
+        "green",
         "mint"
       ],
       "transparent": false,
@@ -384,7 +384,7 @@
     },
     {
       "id": "bg-paper",
-      "name": "暖白纸纹",
+      "name": "Warm paper texture",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-paper.png",
@@ -392,8 +392,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "纸张",
-        "极简",
+        "paper",
+        "minimal",
         "paper"
       ],
       "transparent": false,
@@ -404,7 +404,7 @@
     },
     {
       "id": "bg-grid",
-      "name": "深色坐标网格",
+      "name": "Dark coordinate grid",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-grid.png",
@@ -412,8 +412,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "科技",
-        "网格",
+        "tech",
+        "grid",
         "grid"
       ],
       "transparent": false,
@@ -424,7 +424,7 @@
     },
     {
       "id": "bg-orbit",
-      "name": "蓝紫轨道",
+      "name": "Blue-violet orbit",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-orbit.png",
@@ -432,8 +432,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "科技",
-        "圆环",
+        "tech",
+        "orbit",
         "orbit"
       ],
       "transparent": false,
@@ -444,7 +444,7 @@
     },
     {
       "id": "title-mint",
-      "name": "薄荷人物条",
+      "name": "Mint lower third",
       "category": "titles",
       "kind": "image",
       "fileName": "title-mint.png",
@@ -452,9 +452,9 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "人物",
-        "下三分之一",
-        "采访"
+        "people",
+        "lower third",
+        "interview"
       ],
       "transparent": true,
       "source": "title-mint.svg",
@@ -464,7 +464,7 @@
     },
     {
       "id": "title-coral",
-      "name": "珊瑚字幕条",
+      "name": "Coral caption bar",
       "category": "titles",
       "kind": "image",
       "fileName": "title-coral.png",
@@ -472,9 +472,9 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "字幕",
-        "下三分之一",
-        "标题"
+        "captions",
+        "lower third",
+        "title"
       ],
       "transparent": true,
       "source": "title-coral.svg",
@@ -484,7 +484,7 @@
     },
     {
       "id": "title-glass",
-      "name": "深色信息卡",
+      "name": "Dark info card",
       "category": "titles",
       "kind": "image",
       "fileName": "title-glass.png",
@@ -492,9 +492,9 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "信息",
-        "卡片",
-        "标题"
+        "info",
+        "card",
+        "title"
       ],
       "transparent": true,
       "source": "title-glass.svg",
@@ -504,7 +504,7 @@
     },
     {
       "id": "title-frame",
-      "name": "电影细线边框",
+      "name": "Fine film frame",
       "category": "titles",
       "kind": "image",
       "fileName": "title-frame.png",
@@ -512,9 +512,9 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "边框",
-        "电影",
-        "标题"
+        "frame",
+        "movie",
+        "title"
       ],
       "transparent": true,
       "source": "title-frame.svg",
@@ -524,7 +524,7 @@
     },
     {
       "id": "title-corner",
-      "name": "角标与侧栏",
+      "name": "Corner tag and sidebar",
       "category": "titles",
       "kind": "image",
       "fileName": "title-corner.png",
@@ -532,9 +532,9 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "角标",
-        "栏目",
-        "标题"
+        "corner tag",
+        "section",
+        "title"
       ],
       "transparent": true,
       "source": "title-corner.svg",
@@ -544,7 +544,7 @@
     },
     {
       "id": "title-ribbon",
-      "name": "重点飘带",
+      "name": "Highlight ribbon",
       "category": "titles",
       "kind": "image",
       "fileName": "title-ribbon.png",
@@ -552,9 +552,9 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "重点",
-        "飘带",
-        "标题"
+        "highlight",
+        "ribbon",
+        "title"
       ],
       "transparent": true,
       "source": "title-ribbon.svg",
@@ -564,7 +564,7 @@
     },
     {
       "id": "sound-pop",
-      "name": "轻快气泡",
+      "name": "Light pop",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-pop.wav",
@@ -572,8 +572,8 @@
       "height": 0,
       "duration": 0.25,
       "tags": [
-        "气泡",
-        "转场",
+        "pop",
+        "transition",
         "pop"
       ],
       "transparent": false,
@@ -584,7 +584,7 @@
     },
     {
       "id": "sound-click",
-      "name": "柔和点按",
+      "name": "Soft click",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-click.wav",
@@ -592,8 +592,8 @@
       "height": 0,
       "duration": 0.12,
       "tags": [
-        "点击",
-        "界面",
+        "click",
+        "interface",
         "click"
       ],
       "transparent": false,
@@ -604,7 +604,7 @@
     },
     {
       "id": "sound-chime",
-      "name": "清亮提示",
+      "name": "Bright chime",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-chime.wav",
@@ -612,8 +612,8 @@
       "height": 0,
       "duration": 1.2,
       "tags": [
-        "铃声",
-        "提示",
+        "bell",
+        "notification",
         "chime"
       ],
       "transparent": false,
@@ -624,7 +624,7 @@
     },
     {
       "id": "sound-rise",
-      "name": "向上滑音",
+      "name": "Rising sweep",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-rise.wav",
@@ -632,8 +632,8 @@
       "height": 0,
       "duration": 0.65,
       "tags": [
-        "上升",
-        "转场",
+        "rise",
+        "transition",
         "rise"
       ],
       "transparent": false,
@@ -644,7 +644,7 @@
     },
     {
       "id": "sound-whoosh",
-      "name": "空气掠过",
+      "name": "Airy whoosh",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-whoosh.wav",
@@ -652,8 +652,8 @@
       "height": 0,
       "duration": 0.8,
       "tags": [
-        "掠过",
-        "转场",
+        "whoosh",
+        "transition",
         "whoosh"
       ],
       "transparent": false,
@@ -664,7 +664,7 @@
     },
     {
       "id": "sound-complete",
-      "name": "完成三音",
+      "name": "Three-note finish",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-complete.wav",
@@ -672,8 +672,8 @@
       "height": 0,
       "duration": 1.4,
       "tags": [
-        "成功",
-        "完成",
+        "success",
+        "complete",
         "complete"
       ],
       "transparent": false,
@@ -684,7 +684,7 @@
     },
     {
       "id": "bolt",
-      "name": "闪电强调",
+      "name": "Lightning accent",
       "category": "stickers",
       "kind": "image",
       "fileName": "bolt.png",
@@ -692,8 +692,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "闪电",
-        "能量",
+        "lightning",
+        "energy",
         "bolt"
       ],
       "transparent": true,
@@ -704,7 +704,7 @@
     },
     {
       "id": "cloud",
-      "name": "绵软云朵",
+      "name": "Soft cloud",
       "category": "stickers",
       "kind": "image",
       "fileName": "cloud.png",
@@ -712,8 +712,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "天气",
-        "天空",
+        "weather",
+        "sky",
         "cloud"
       ],
       "transparent": true,
@@ -724,7 +724,7 @@
     },
     {
       "id": "moon",
-      "name": "月夜星辰",
+      "name": "Moonlit stars",
       "category": "stickers",
       "kind": "image",
       "fileName": "moon.png",
@@ -732,8 +732,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "月亮",
-        "夜晚",
+        "moon",
+        "night",
         "moon"
       ],
       "transparent": true,
@@ -744,7 +744,7 @@
     },
     {
       "id": "leaf",
-      "name": "新芽绿叶",
+      "name": "Fresh green leaf",
       "category": "stickers",
       "kind": "image",
       "fileName": "leaf.png",
@@ -752,8 +752,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "植物",
-        "自然",
+        "plant",
+        "nature",
         "leaf"
       ],
       "transparent": true,
@@ -764,7 +764,7 @@
     },
     {
       "id": "flame",
-      "name": "热力火苗",
+      "name": "Bright flame",
       "category": "stickers",
       "kind": "image",
       "fileName": "flame.png",
@@ -772,8 +772,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "火焰",
-        "热门",
+        "fire",
+        "trending",
         "flame"
       ],
       "transparent": true,
@@ -784,7 +784,7 @@
     },
     {
       "id": "camera",
-      "name": "旅行相机",
+      "name": "Travel camera",
       "category": "stickers",
       "kind": "image",
       "fileName": "camera.png",
@@ -792,8 +792,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "摄影",
-        "旅行",
+        "photography",
+        "travel",
         "camera"
       ],
       "transparent": true,
@@ -804,7 +804,7 @@
     },
     {
       "id": "headphones",
-      "name": "随身耳机",
+      "name": "Everyday headphones",
       "category": "stickers",
       "kind": "image",
       "fileName": "headphones.png",
@@ -812,8 +812,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "音乐",
-        "聆听",
+        "music",
+        "listen",
         "headphones"
       ],
       "transparent": true,
@@ -824,7 +824,7 @@
     },
     {
       "id": "microphone",
-      "name": "播客话筒",
+      "name": "Podcast microphone",
       "category": "stickers",
       "kind": "image",
       "fileName": "microphone.png",
@@ -832,8 +832,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "录音",
-        "采访",
+        "recording",
+        "interview",
         "microphone"
       ],
       "transparent": true,
@@ -844,7 +844,7 @@
     },
     {
       "id": "coffee",
-      "name": "咖啡时刻",
+      "name": "Coffee break",
       "category": "stickers",
       "kind": "image",
       "fileName": "coffee.png",
@@ -852,8 +852,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "生活",
-        "饮品",
+        "life",
+        "drink",
         "coffee"
       ],
       "transparent": true,
@@ -864,7 +864,7 @@
     },
     {
       "id": "paw",
-      "name": "萌宠脚印",
+      "name": "Pet paw prints",
       "category": "stickers",
       "kind": "image",
       "fileName": "paw.png",
@@ -872,8 +872,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "动物",
-        "宠物",
+        "animal",
+        "pet",
         "paw"
       ],
       "transparent": true,
@@ -884,7 +884,7 @@
     },
     {
       "id": "medal",
-      "name": "高光奖章",
+      "name": "Achievement medal",
       "category": "stickers",
       "kind": "image",
       "fileName": "medal.png",
@@ -892,8 +892,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "奖励",
-        "成就",
+        "reward",
+        "achievement",
         "medal"
       ],
       "transparent": true,
@@ -904,7 +904,7 @@
     },
     {
       "id": "clock",
-      "name": "时间提醒",
+      "name": "Time reminder",
       "category": "stickers",
       "kind": "image",
       "fileName": "clock.png",
@@ -912,8 +912,8 @@
       "height": 512,
       "duration": 5,
       "tags": [
-        "时钟",
-        "倒计时",
+        "clock",
+        "countdown",
         "clock"
       ],
       "transparent": true,
@@ -924,7 +924,7 @@
     },
     {
       "id": "bg-aurora",
-      "name": "极光夜幕",
+      "name": "Aurora night",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-aurora.png",
@@ -932,8 +932,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "极光",
-        "夜景",
+        "aurora",
+        "nightscape",
         "aurora"
       ],
       "transparent": false,
@@ -944,7 +944,7 @@
     },
     {
       "id": "bg-ocean",
-      "name": "海蓝波浪",
+      "name": "Ocean waves",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-ocean.png",
@@ -952,8 +952,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "海洋",
-        "蓝色",
+        "ocean",
+        "blue",
         "ocean"
       ],
       "transparent": false,
@@ -964,7 +964,7 @@
     },
     {
       "id": "bg-lavender",
-      "name": "薰衣草光晕",
+      "name": "Lavender glow",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-lavender.png",
@@ -972,8 +972,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "紫色",
-        "梦幻",
+        "purple",
+        "dreamy",
         "lavender"
       ],
       "transparent": false,
@@ -984,7 +984,7 @@
     },
     {
       "id": "bg-peach",
-      "name": "蜜桃几何",
+      "name": "Peach geometry",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-peach.png",
@@ -992,8 +992,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "粉色",
-        "几何",
+        "pink",
+        "geometry",
         "peach"
       ],
       "transparent": false,
@@ -1004,7 +1004,7 @@
     },
     {
       "id": "bg-sand",
-      "name": "大漠沙丘",
+      "name": "Desert dunes",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-sand.png",
@@ -1012,8 +1012,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "沙漠",
-        "自然",
+        "desert",
+        "nature",
         "sand"
       ],
       "transparent": false,
@@ -1024,7 +1024,7 @@
     },
     {
       "id": "bg-dots",
-      "name": "奶油波点",
+      "name": "Cream polka dots",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-dots.png",
@@ -1032,8 +1032,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "波点",
-        "可爱",
+        "dots",
+        "cute",
         "dots"
       ],
       "transparent": false,
@@ -1044,7 +1044,7 @@
     },
     {
       "id": "bg-blueprint",
-      "name": "工程蓝图",
+      "name": "Technical blueprint",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-blueprint.png",
@@ -1052,8 +1052,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "蓝图",
-        "科技",
+        "blueprint",
+        "tech",
         "blueprint"
       ],
       "transparent": false,
@@ -1064,7 +1064,7 @@
     },
     {
       "id": "bg-comic",
-      "name": "漫画放射",
+      "name": "Comic rays",
       "category": "backgrounds",
       "kind": "image",
       "fileName": "bg-comic.png",
@@ -1072,8 +1072,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "漫画",
-        "强调",
+        "comic",
+        "emphasis",
         "comic"
       ],
       "transparent": false,
@@ -1084,7 +1084,7 @@
     },
     {
       "id": "title-pill",
-      "name": "圆角姓名牌",
+      "name": "Rounded name tag",
       "category": "titles",
       "kind": "image",
       "fileName": "title-pill.png",
@@ -1092,8 +1092,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "人物",
-        "圆角",
+        "people",
+        "rounded",
         "pill"
       ],
       "transparent": true,
@@ -1104,7 +1104,7 @@
     },
     {
       "id": "title-news",
-      "name": "资讯双层条",
+      "name": "Double news bar",
       "category": "titles",
       "kind": "image",
       "fileName": "title-news.png",
@@ -1112,8 +1112,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "资讯",
-        "新闻",
+        "updates",
+        "news",
         "news"
       ],
       "transparent": true,
@@ -1124,7 +1124,7 @@
     },
     {
       "id": "title-split",
-      "name": "双色章节卡",
+      "name": "Two-tone chapter card",
       "category": "titles",
       "kind": "image",
       "fileName": "title-split.png",
@@ -1132,8 +1132,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "章节",
-        "分屏",
+        "chapter",
+        "split screen",
         "split"
       ],
       "transparent": true,
@@ -1144,7 +1144,7 @@
     },
     {
       "id": "title-subtitle",
-      "name": "柔暗字幕底",
+      "name": "Soft dark caption bar",
       "category": "titles",
       "kind": "image",
       "fileName": "title-subtitle.png",
@@ -1152,8 +1152,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "字幕",
-        "渐变",
+        "captions",
+        "gradient",
         "subtitle"
       ],
       "transparent": true,
@@ -1164,7 +1164,7 @@
     },
     {
       "id": "title-tape",
-      "name": "便签胶带",
+      "name": "Memo tape",
       "category": "titles",
       "kind": "image",
       "fileName": "title-tape.png",
@@ -1172,8 +1172,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "手账",
-        "胶带",
+        "journal",
+        "tape",
         "tape"
       ],
       "transparent": true,
@@ -1184,7 +1184,7 @@
     },
     {
       "id": "title-chapter",
-      "name": "极简章节线",
+      "name": "Minimal chapter line",
       "category": "titles",
       "kind": "image",
       "fileName": "title-chapter.png",
@@ -1192,8 +1192,8 @@
       "height": 1080,
       "duration": 5,
       "tags": [
-        "章节",
-        "极简",
+        "chapter",
+        "minimal",
         "chapter"
       ],
       "transparent": true,
@@ -1204,7 +1204,7 @@
     },
     {
       "id": "sound-shutter",
-      "name": "电子快门",
+      "name": "Digital shutter",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-shutter.wav",
@@ -1212,8 +1212,8 @@
       "height": 0,
       "duration": 0.22,
       "tags": [
-        "摄影",
-        "快门",
+        "photography",
+        "shutter",
         "shutter"
       ],
       "transparent": false,
@@ -1224,7 +1224,7 @@
     },
     {
       "id": "sound-impact",
-      "name": "低频强调",
+      "name": "Low impact",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-impact.wav",
@@ -1232,8 +1232,8 @@
       "height": 0,
       "duration": 0.5,
       "tags": [
-        "鼓点",
-        "强调",
+        "drum hit",
+        "emphasis",
         "impact"
       ],
       "transparent": false,
@@ -1244,7 +1244,7 @@
     },
     {
       "id": "sound-twinkle",
-      "name": "星点提示",
+      "name": "Twinkle cue",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-twinkle.wav",
@@ -1252,8 +1252,8 @@
       "height": 0,
       "duration": 1.5,
       "tags": [
-        "提示",
-        "星光",
+        "notification",
+        "starlight",
         "twinkle"
       ],
       "transparent": false,
@@ -1264,7 +1264,7 @@
     },
     {
       "id": "sound-fall",
-      "name": "向下滑音",
+      "name": "Falling sweep",
       "category": "sounds",
       "kind": "audio",
       "fileName": "sound-fall.wav",
@@ -1272,8 +1272,8 @@
       "height": 0,
       "duration": 0.65,
       "tags": [
-        "下降",
-        "转场",
+        "fall",
+        "transition",
         "fall"
       ],
       "transparent": false,

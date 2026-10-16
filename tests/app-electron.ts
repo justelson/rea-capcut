@@ -44,9 +44,9 @@ try {
         return {
           canceled: false,
           filePaths:
-            options.title === "导入素材"
+            options.title === "Import media"
               ? [p.video, p.audio, p.image]
-              : options.title === "打开 ReaCut 项目"
+              : options.title === "Open ReaCut project"
                 ? [p.saved]
                 : [p.subtitles],
         };
@@ -55,7 +55,7 @@ try {
         const options = args[args.length - 1];
         return {
           canceled: false,
-          filePath: options.title === "导出视频" ? p.exported : p.saved,
+          filePath: options.title === "Export video" ? p.exported : p.saved,
         };
       };
       (dialog as any).showMessageBox = async () => ({
@@ -160,7 +160,7 @@ try {
     const before = await stat(saved)
       .then((s) => s.mtimeMs)
       .catch(() => -1);
-    await page!.getByRole("button", { name: "保存项目", exact: true }).click();
+    await page!.getByRole("button", { name: "Save project", exact: true }).click();
     await expect
       .poll(
         async () =>
@@ -208,25 +208,25 @@ try {
       { timeout: 15_000 },
     )
     .toBe(true);
-  await page.getByRole("button", { name: "播放", exact: true }).click();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
   await expect(
-    page.getByRole("button", { name: "暂停", exact: true }),
+    page.getByRole("button", { name: "Pause", exact: true }),
   ).toBeVisible();
   await expect
     .poll(async () => page!.locator(".timecode strong").textContent(), {
       timeout: 5000,
     })
     .not.toBe("00:00:00:00");
-  await page.getByRole("button", { name: "暂停", exact: true }).click();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
   // Seek precisely through a real timeline ruler click to split at one second.
   const ruler = (await page.locator(".tl-ruler-body").boundingBox())!;
   await page.mouse.click(ruler.x + 60, ruler.y + 15);
-  await page.getByRole("button", { name: "分割片段", exact: true }).click();
+  await page.getByRole("button", { name: "Split clip", exact: true }).click();
   await expect(page.locator(".tl-clip")).toHaveCount(2);
   project = await saveProject();
   assert.equal(project.clips[0].duration, 1);
   assert.equal(project.clips[1].sourceIn, 1);
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(page.locator(".tl-clip")).toHaveCount(1);
   // Native accelerators must reach clip copy/paste when the timeline has focus.
   await page.locator(".tl-clip").click({ position: { x: 30, y: 26 } });
@@ -234,7 +234,7 @@ try {
   await page.keyboard.press(command + "+C");
   await page.keyboard.press(command + "+V");
   await expect(page.locator(".tl-clip")).toHaveCount(2);
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect(page.locator(".tl-clip")).toHaveCount(1);
   // Audio selection must expose audio properties immediately (without a hidden visual tab).
   const audio = project.assets.find((a) => a.kind === "audio")!;
@@ -242,25 +242,25 @@ try {
   await expect(
     page
       .locator(".inspector-tabs")
-      .getByRole("button", { name: "音频", exact: true }),
+      .getByRole("button", { name: "Audio", exact: true }),
   ).toHaveClass(/active/);
   await expect(
-    page.getByRole("spinbutton", { name: "音量", exact: true }),
+    page.getByRole("spinbutton", { name: "Volume", exact: true }),
   ).toBeVisible();
   project = await saveProject();
   assert(project.clips.some((c) => c.assetId === audio.id));
   // Text is created and edited through normal controls and persists in the project.
   await page
     .locator(".resource-tabs")
-    .getByRole("button", { name: "文本", exact: true })
+    .getByRole("button", { name: "Text", exact: true })
     .click();
-  await page.getByRole("button", { name: "添加文本", exact: true }).click();
+  await page.getByRole("button", { name: "Add text", exact: true }).click();
   await page
-    .getByRole("textbox", { name: "文字内容", exact: true })
+    .getByRole("textbox", { name: "Text", exact: true })
     .fill("离线创作\n每一刻都值得记录");
-  await page.getByRole("textbox", { name: "文字内容", exact: true }).blur();
-  await page.getByRole("spinbutton", { name: "字号", exact: true }).fill("24");
-  await page.getByRole("spinbutton", { name: "字号", exact: true }).blur();
+  await page.getByRole("textbox", { name: "Text", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Font size", exact: true }).fill("24");
+  await page.getByRole("spinbutton", { name: "Font size", exact: true }).blur();
   project = await saveProject();
   const text = project.clips.find((c) => !!c.text)!;
   assert.equal(text.text?.text, "离线创作\n每一刻都值得记录");
@@ -271,20 +271,20 @@ try {
     .click({ position: { x: 30, y: 26 } });
   await page
     .locator(".inspector-tabs")
-    .getByRole("button", { name: "调色", exact: true })
+    .getByRole("button", { name: "Color", exact: true })
     .click();
-  const saturation = page.getByRole("slider", { name: "饱和度", exact: true });
+  const saturation = page.getByRole("slider", { name: "Saturation", exact: true });
   await saturation.focus();
   await saturation.press("Home");
   for (let i = 0; i < 50; i++) await saturation.press("ArrowRight");
   await page
     .locator(".inspector-tabs")
-    .getByRole("button", { name: "速度", exact: true })
+    .getByRole("button", { name: "Speed", exact: true })
     .click();
   await page
-    .getByRole("spinbutton", { name: "播放速度", exact: true })
+    .getByRole("spinbutton", { name: "Playback speed", exact: true })
     .fill("2");
-  await page.getByRole("spinbutton", { name: "播放速度", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Playback speed", exact: true }).blur();
   project = await saveProject();
   let clip = project.clips.find((c) => c.assetId === video.id)!;
   assert.equal(clip.speed, 2);
@@ -292,20 +292,20 @@ try {
   assert.equal(clip.adjustments.saturation, 0.5);
   await page
     .locator(".inspector-tabs")
-    .getByRole("button", { name: "动画", exact: true })
+    .getByRole("button", { name: "Animation", exact: true })
     .click();
   await page
     .locator(".keyframe-add")
-    .getByRole("button", { name: "位置 X", exact: true })
+    .getByRole("button", { name: "Position X", exact: true })
     .click();
   project = await saveProject();
   clip = project.clips.find((c) => c.assetId === video.id)!;
   assert.equal(clip.keyframes.length, 1);
   await page
     .locator(".resource-tabs")
-    .getByRole("button", { name: "字幕", exact: true })
+    .getByRole("button", { name: "Captions", exact: true })
     .click();
-  await page.getByRole("button", { name: "导入字幕文件", exact: true }).click();
+  await page.getByRole("button", { name: "Import caption file", exact: true }).click();
   project = await saveProject();
   assert(project.clips.some((c) => c.text?.text === "本地字幕验收"));
   // Change a local test project externally so re-opening proves the actual file is read.
@@ -314,8 +314,8 @@ try {
     JSON.stringify({ ...project, name: "桌面验收 · 重新打开" }, null, 2),
   );
   // Re-open the actual saved file through the native dialog path and check hydrated media.
-  await page.getByRole("button", { name: "文件菜单", exact: true }).click();
-  await page.getByRole("button", { name: "打开项目", exact: false }).click();
+  await page.getByRole("button", { name: "File menu", exact: true }).click();
+  await page.getByRole("button", { name: "Open project", exact: false }).click();
   await expect(page.locator(".tl-clip")).toHaveCount(project.clips.length);
   await expect(page.locator(".project-title input")).toHaveValue(
     "桌面验收 · 重新打开",
@@ -325,15 +325,15 @@ try {
     .toEqual(expect.arrayContaining([255]));
   // Reduce render dimensions through project parameters after clearing selection.
   await page.keyboard.press("Escape");
-  await page.getByRole("spinbutton", { name: "宽度", exact: true }).fill("320");
-  await page.getByRole("spinbutton", { name: "高度", exact: true }).fill("180");
-  await page.getByRole("spinbutton", { name: "高度", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Width", exact: true }).fill("320");
+  await page.getByRole("spinbutton", { name: "Height", exact: true }).fill("180");
+  await page.getByRole("spinbutton", { name: "Height", exact: true }).blur();
   project = await saveProject();
   assert.equal(project.width, 320);
   assert.equal(project.height, 180);
-  await page.getByRole("button", { name: "导出", exact: true }).click();
-  await page.getByRole("button", { name: "开始导出", exact: true }).click();
-  await expect(page.getByText("导出完成", { exact: true })).toBeVisible({
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await page.getByRole("button", { name: "Start export", exact: true }).click();
+  await expect(page.getByText("Export complete", { exact: true })).toBeVisible({
     timeout: 120_000,
   });
   const rendered = await probeFile(exported);
@@ -348,18 +348,18 @@ try {
   await page.screenshot({
     path: path.join(root, "docs", "screenshots", "electron-export.png"),
     // Public evidence must not expose the workstation username or local output path.
-    mask: [page.getByLabel("导出位置", { exact: true })],
+    mask: [page.getByLabel("Export location", { exact: true })],
     maskColor: "#262626",
   });
-  await page.getByRole("button", { name: "完成", exact: true }).click();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await page
     .locator(".resource-tabs")
-    .getByRole("button", { name: "素材", exact: true })
+    .getByRole("button", { name: "Media", exact: true })
     .click();
   await expect(
     page
       .locator(".resource-tabs")
-      .getByRole("button", { name: "素材", exact: true }),
+      .getByRole("button", { name: "Media", exact: true }),
   ).toHaveClass(/active/);
   await verifyThumbnails();
   const finalGeometry = await verifyEditorViewport(page);

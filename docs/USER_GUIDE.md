@@ -1,82 +1,93 @@
-# 使用指南
+# ReaCut user guide
 
-## 第一个项目
+## Start a project
 
-启动桌面应用，确认“设置”显示 FFmpeg / FFprobe 可用。macOS 安装包已内置工具，无需额外安装；也可分别选择自定义可执行文件。新项目默认 1920×1080、30 fps；没有选中片段时，右侧项目参数可修改名称、画布比例、尺寸、帧率和背景。
+Open **Settings** and check FFmpeg and FFprobe. Windows previews require these tools separately; choose their executables if automatic discovery cannot find them. FFmpeg needs `libx264` and AAC support for export.
 
-点击素材区“导入”，选择本地视频、图片或音频，也可以把本机文件拖进窗口。双击素材或点击素材的添加按钮将它加入时间线；拖到指定可编辑轨道可选择位置。导入可能需要探测、缩略图或本地预览代理转换。
+A new project starts at 1920 × 1080 and 30 fps. With no clip selected, the right-hand inspector shows the name, canvas ratio, dimensions, frame rate and background.
 
-普通项目保存记录素材的绝对路径。移动或删除源文件后，素材会显示丢失，需要通过素材操作重新链接。项目文件本身不包含视频、音频或图片；跨文件夹搬移可使用下文的“收集项目素材”。
+Use **Import media** or drag local video, audio and images into the editor. Single-click to preview a source. Double-click or use its add button to place it on the timeline; drag to an unlocked compatible track to choose its position.
 
-## 先预览再选段
+Save through **File → Save project**. A normal `.reacut` file references media in its original locations. Moving the media can break those references; relink missing sources or collect a portable project before moving everything.
 
-单击媒体卡片可在中间预览视频、音频或图片。视频/音频支持播放、逐帧和设置入出点；焦点在源预览区时，`I` / `O` 标记当前位置，空格播放选段。点击“添加选中片段”插入当前时间线播放头位置，保留源素材入点，可一次撤销。双击卡片或点击加号仍添加完整素材。
+## Window and workspace
 
-关闭源预览或点击时间线，返回项目播放器。锁定轨道不会接收片段，自动选择其他兼容轨道或创建新轨。选段至少为项目一帧；丢失或无法解码的素材需先处理。
+Drag an empty part of the custom top bar to move the window. Windows uses native minimize, maximize/restore and close buttons on the right, with operating-system Snap behavior. Double-clicking the draggable area uses the system's maximize/restore behavior. Menus, project-name input and action buttons remain clickable.
 
-素材区、播放器和右侧属性区之间的分隔线可拖动调整宽度，自动记住布局。聚焦分隔线后用左右箭头微调（Shift 加速）；双击或按 Home 恢复默认。缩小窗口会保留各区最小可用宽度，调整布局不影响项目撤销历史。
+macOS keeps traffic-light controls on the left. Linux uses Electron's native controls. The bar reserves space for the platform's controls so they do not cover project actions.
 
-## 时间线
+Drag the dividers between the media library, player and inspector to resize panels. Focus a divider and use arrow keys for small adjustments; Shift moves faster. Double-click or press Home to reset. Drag the divider above the timeline, or use its up/down arrow keys, to change timeline height.
 
-点击片段选择，配合平台的多选修饰键选择多段；拖动片段改变时间或放到兼容轨道。拖片段两侧裁剪；将播放头放在片段内，使用分割按钮或 `⌘/Ctrl+B`。复制、粘贴、复制片段和删除都可撤销。
+## Preview and insert a source range
 
-轨道可以重命名、排序、删除、锁定、静音或隐藏。删除有片段的轨道先确认，删除保留素材库，并可一次撤销恢复轨道与片段；锁轨禁止删除/重命名/移动，移动也不会交换相邻锁轨。锁定禁止修改，仍会参与播放和导出；隐藏画面只隐藏视频图层，其声音仍可听见，需要单独静音。音频轨道不会作为画面绘制。拖动时间线上方分隔条可调整高度，聚焦分隔条后也能用上下箭头调整。
+Select a media card to open its source preview. Video and audio support playback, frame stepping and in/out points. While that preview has focus, **I** marks the in point, **O** the out point, and Space plays the selection. Insert the range at the timeline playhead. Double-clicking or using the regular add button inserts the full source.
 
-吸附让片段边缘靠近时间线标记或其他边缘时对齐。磁吸在删除片段时压缩同轨后续片段；它不是所有剪映主轨磁吸行为的完整实现。同轨重叠片段显示为不同子行，避免重叠后无法选中。
+Return to the timeline to switch back to the project player. Locked tracks cannot receive edits. Missing or undecodable sources must be relinked or converted first.
 
-## 画面、声音与动画
+## Edit the timeline
 
-选中画面片段后，在右侧调整位置、缩放、旋转、翻转和透明度。播放器中拖动所选画面可实时预览位置变化；该属性有关键帧时整条路径一起移动，松开产生一次撤销。播放头到项目末尾时保留最后一帧供查看。“调整”或本地效果预设控制亮度、对比度、饱和度、色温和模糊。
+Click a clip to select it. Use the platform's selection modifier to select several. Drag to move a clip in time or onto a compatible track; drag its edges to trim. Put the playhead inside a clip and use Split or **Ctrl+B** on Windows/Linux, **Cmd+B** on Mac.
 
-“音频”控制音量、静音与声音淡入淡出；画面淡入淡出与声音分别设置。带声音的视频可通过分离音频操作创建独立声音轨，原视频会静音。常规速度范围为 0.1–8 倍；时长随速度改变，音频采用保持音高的处理。
+Tracks can be renamed, reordered, deleted, locked, muted or hidden. Deleting a nonempty track asks for confirmation, preserves the source in the media library and can be undone. Locked tracks cannot be edited or reordered. Hiding a video layer does not mute its audio; use Mute for that.
 
-移动播放头，点击属性旁的菱形添加关键帧；已有关键帧的属性后续调整写入当前时间。在“动画”中查看、删除关键帧和改变线性/缓入缓出插值。分割、裁剪和变速保留曲线与淡化包络；重新设置淡化参数会建立当前片段的新包络。
+Snapping aligns nearby clip edges and markers. Ripple deletion closes the deleted interval on the same track. Overlapping clips appear on separate subrows so each remains selectable. Undo and redo cover normal timeline changes.
 
-文本区提供 16 款可编辑模板，按标题、字幕、标记、动态分类；点击加号添加到播放头，右侧继续编辑文字。特效区有 8 款调色和 8 款动态特效，后者会覆盖对应属性的关键帧，其余参数保留。转场区提供 8 款预设，先选同轨相邻画面的前一段，再设置时长并点击加号；除「经过背景」外，后段会提前重叠，不裁掉源素材。转场不跨越间隙，不允许锁轨或与后续片段冲突，时长按帧限制到两段各一半以内。悬停或键盘聚焦缩略图可预览，添加与应用均支持一次撤销。片段淡入淡出保留在特效区。详见 [创意素材库](CREATIVE_LIBRARY.md)。右侧“画面”下的“裁剪”按源空间比例截取素材；“抠像”用 RGB 颜色、相似度与过渡移除选定颜色；“蒙版”提供矩形/椭圆、尺寸、羽化与反选。各功能默认未启用，清除操作移除对应效果，锁轨时禁止修改。它们有实际预览和导出验证，仍不是商业 AI 人物抠像或完整蒙版系统。
+## Picture, audio and animation
 
-## 文字与字幕
+Select a visual clip to adjust position, scale, rotation, flipping and opacity. Drag its image in the player to preview a position change, then release to commit one undoable edit. If the property has keyframes, dragging moves the animation path together.
 
-在“文本”添加文字或本地样式预设。右侧编辑内容、字号、内置 Noto Sans SC 或本机字体、颜色、粗体、对齐、描边与背景。模板由本项目自行定义，不包含剪映字体或模板素材。
+Use the inspector for color, cropping, chroma key, masks and animation. Chroma key removes a chosen RGB color; it is not AI portrait cutout. Masks support rectangles and ellipses with feathering and inversion.
 
-在“字幕”导入 SRT 或基本 WebVTT。字幕成为文字轨上的可编辑片段，时间按项目帧率处理。导出字幕产生 SRT，包含项目中的文字片段；没有保留完整 WebVTT 定位、样式或富文本属性。本期不提供语音识别或云端自动字幕。
+Audio controls include volume, mute and fades. Picture and audio fades are separate. Detaching audio creates an independent audio source and mutes the video's sound. Constant speed ranges from 0.1× to 8×; duration changes while audio processing preserves pitch.
 
-字幕面板还可选择文字轨、搜索、多选、点击定位，以及编辑内容和起止秒数。批量操作包括时间偏移、文字查找替换、统一样式；先检查修改再应用，一次撤销即可恢复。时间按项目帧率对齐，锁轨禁止修改；编辑状态变化后需重新检查批量计划。统一样式保留各句文字，平移时间保留片段内部动画。
+Move the playhead and click a property's diamond to add a keyframe. The animation panel lets you inspect/remove keyframes and choose linear or smooth interpolation. Trimming, splitting and speed changes preserve relevant animation intervals and fade envelopes.
 
-## 导入剪映本地项目
+## Text, presets and captions
 
-在桌面端“文件”菜单选择“导入剪映项目文件夹”或“导入剪映草稿文件”。项目文件夹包含多个时间线时，会推荐上次活动的时间线；确认名称后导入，空白主时间线不会自动替代活动时间线。也可明确选择某条时间线的草稿文件。
+Add an editable template from the text library, then edit its content, font, size, color, alignment, stroke and background in the inspector. Built-in recipes belong to this project and do not include CapCut proprietary templates.
 
-支持明文 JSON 和本轮验证的本地不透明载体。文件必须通过格式与完整性检查，失败会保留当前编辑。整个过程不修改原草稿；导入后保存为 `.reacut`。移动过的源媒体需要重新链接。
+Effects include color and motion presets. Motion presets replace keyframes for the affected properties, preserving other settings. For a transition, select the first of two adjacent visual clips on the same track, choose a transition and duration. Transitions cannot bridge gaps, alter locked tracks or conflict with later clips.
 
-这是有损导入：基础视频、声音、文字和常规变换可以转换；字体排版、复杂效果等会显示警告。请核对画面、声音和导出，版本覆盖见 [互通说明](CAPCUT_INTEROP.md)。浏览器预览只支持明文文件，完整目录选择与解码需桌面客户端。
+Import SRT or basic WebVTT through the captions tools. Captions become editable text clips. The captions panel supports search, multiselect, text/timing edits, batch time shifts, find/replace and shared styling. Review a batch change before applying it. Edits are frame-aligned and undoable.
 
-## 保存、恢复与导出
+Caption export writes SRT from the project's text clips. Full WebVTT styling and positioning are not preserved. Automatic speech recognition is not included. Your own captions, filenames and project text retain the language you wrote them in.
 
-使用 `⌘/Ctrl+S` 保存 `.reacut` 项目。“文件”可打开、另存为或新建项目。最近项目显示在设置中。本地自动保存采用延迟写入，启动时发现可恢复项目会提示恢复；操作完成后仍应保存到自己的文件位置。
+## Move a project with its media
 
-在“文件 → 收集项目素材…”选择目标文件夹，应用创建包含 `项目.reacut`、`media/` 与首次收集校验清单的新文件夹。共用原文件只复制一份，包含媒体库中未上时间线的素材。移动整个文件夹后打开其中的项目即可继续编辑；直接保存保留相对路径，新导入素材也复制进包。丢失的包内文件不会阻止保存其他编辑，播放/导出仍需重新链接。预览缓存和系统字体不打包，系统字体需在目标电脑安装。`manifest.json` 是首次收集的历史校验清单，不随编辑更新。
+Use **File → Collect project media** and choose a destination. ReaCut copies original media, deduplicates shared sources, removes cache references and writes a portable `.reacut` project. Move the complete folder, including `media`. Collection does not modify originals.
 
-导出范围支持整片、选中片段覆盖区间、自定义起止秒数。区间包含该时段全部可见图层和未静音声音，以及片段之间的空隙；不是只导出选中图层。
+You can keep editing a reopened portable project and collect newly added sources when saving. Fonts still depend on the destination computer and ReaCut's bundled font. Missing sources must be relinked before collection.
 
-点击导出选择保存位置、分辨率、帧率、画质和 MP4 / MOV。当前两个容器均编码为 H.264 / AAC。导出使用原素材和本机 FFmpeg，不上传媒体。进度窗口可取消；只有成功完成才替换目标文件。
+## Export video
 
-若项目引用的源时间超出文件、素材丢失、文字图层过大或参数超出支持范围，导出会给出错误，先修正项目再重试。Chromium 预览不支持的编码会尝试代理；若代理转换失败，界面提示预览问题，导出是否可用仍取决于原素材与 FFmpeg 能力。
+Choose **Export** in the top bar. Select the full timeline, selected clips' range, or a custom interval; choose dimensions, frame rate, quality and MP4 or MOV. Pick the output file and start export.
 
-## 快捷键
+Output uses H.264 video and AAC audio. Export writes a temporary file and replaces the chosen destination only after success. Cancel stops the job and removes unfinished output. Keep the project and media until you have checked the rendered video.
 
-| 操作 | macOS / Windows、Linux |
-| --- | --- |
-| 播放 / 暂停 | Space |
-| 分割 | ⌘ / Ctrl + B |
-| 复制 / 粘贴 | ⌘ / Ctrl + C / V |
-| 复制片段 | ⌘ / Ctrl + D |
-| 撤销 / 重做 | ⌘ / Ctrl + Z / Shift + Z |
-| 全选片段 | ⌘ / Ctrl + A |
-| 删除 | Delete / Backspace |
-| 前后帧 | ← / → |
-| 前后 1 秒 | Shift + ← / → |
-| 项目新建 / 打开 / 保存 | ⌘ / Ctrl + N / O / S |
-| 导入 / 导出 | ⌘ / Ctrl + I / E |
-| 时间线缩放 | + / − |
+## Keyboard shortcuts
 
-输入框编辑时保留正常文字输入行为。浏览器预览没有完整桌面文件桥接、可靠跨会话媒体恢复或 FFmpeg 视频导出。
+| Action | Windows / Linux | macOS |
+| --- | --- | --- |
+| Play / pause | Space | Space |
+| Split | Ctrl+B | Cmd+B |
+| Delete | Delete / Backspace | Delete / Backspace |
+| Undo | Ctrl+Z | Cmd+Z |
+| Redo | Ctrl+Shift+Z / Ctrl+Y | Cmd+Shift+Z |
+| Copy / paste | Ctrl+C / Ctrl+V | Cmd+C / Cmd+V |
+| Duplicate | Ctrl+D | Cmd+D |
+| Select all | Ctrl+A | Cmd+A |
+| New / open / save | Ctrl+N / Ctrl+O / Ctrl+S | Cmd+N / Cmd+O / Cmd+S |
+| Import / export | Ctrl+I / Ctrl+E | Cmd+I / Cmd+E |
+| Previous / next frame | Left / Right | Left / Right |
+| Timeline zoom | + / − | + / − |
+| Beginning / end | Home / End | Home / End |
+
+Input fields keep normal text-editing shortcuts. Some shortcuts are scoped to the focused preview or timeline. Use **Keyboard shortcuts** for the editor's reference.
+
+## Optional features and limits
+
+The editing assistant is optional. Sending a message invokes your installed, signed-in Codex or Claude CLI with your prompt, bounded history and a project summary. Review proposed edits before applying them. Ordinary editing does not require an AI account.
+
+CapCut/Jianying import is experimental and lossy. Choose a draft file or project folder and, when prompted, its timeline. Check canvas, timing, missing media and text before saving as `.reacut`. Complex effects, fonts and keyframes may be lost. ReaCut does not write CapCut drafts back or promise arbitrary-version compatibility.
+
+This is an early editor. Large projects, unusual codecs and advanced color/HDR workflows need separate validation. Keep backups of important work.

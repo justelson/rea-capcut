@@ -98,7 +98,7 @@ function project(clips: Clip[]): Project {
     tracks: [
       {
         id: "title",
-        name: "标题",
+        name: "Title",
         kind: "text",
         muted: false,
         hidden: false,
@@ -114,7 +114,7 @@ function project(clips: Clip[]): Project {
       },
       {
         id: "video",
-        name: "视频",
+        name: "Video",
         kind: "video",
         muted: false,
         hidden: false,
@@ -122,7 +122,7 @@ function project(clips: Clip[]): Project {
       },
       {
         id: "audio",
-        name: "音频",
+        name: "Audio",
         kind: "audio",
         muted: false,
         hidden: false,
@@ -995,14 +995,14 @@ describe("real local media and FFmpeg export", () => {
         settings("invalid.mp4"),
         () => {},
       ),
-    ).rejects.toThrow("超出源素材时长");
+    ).rejects.toThrow("exceeds the source duration");
     await expect(
       startExport(
         project([clip(assets[0], "video")]),
         settings("unused.mp4", { path: assets[0].path }),
         () => {},
       ),
-    ).rejects.toThrow("不能覆盖");
+    ).rejects.toThrow("cannot overwrite source media");
     if (process.platform !== "win32") {
       const aliasPath = path.join(directory, "source-alias.mp4");
       await symlink(assets[0].path, aliasPath);
@@ -1015,7 +1015,7 @@ describe("real local media and FFmpeg export", () => {
           settings("unused.mp4", { path: assets[0].path }),
           () => {},
         ),
-      ).rejects.toThrow("不能覆盖");
+    ).rejects.toThrow("cannot overwrite source media");
     }
     const options = settings("existing.mp4");
     await writeFile(options.path, "original output");

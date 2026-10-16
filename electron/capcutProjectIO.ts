@@ -41,7 +41,7 @@ function assertContained(root: string, path: string): void {
     displacement.startsWith(`..${sep}`) ||
     isAbsolute(displacement)
   )
-    throw new Error("剪映草稿路径逃离所选项目目录");
+    throw new Error("CapCut draft path escapes the selected project directory");
 }
 
 /** Missing sidecars are optional only when their nearest existing location is
@@ -65,10 +65,10 @@ async function verifyMissingPath(root: string, path: string): Promise<void> {
     }
     const parent = dirname(cursor);
     if (parent === cursor)
-      throw new Error("无法验证剪映草稿缺失路径的项目目录边界");
+      throw new Error("Could not verify the project directory boundary for the missing CapCut draft path");
     cursor = parent;
   }
-  throw new Error("剪映草稿路径层级超过验证限制");
+  throw new Error("CapCut draft path exceeds the validation depth limit");
 }
 
 async function confinedRealpath(root: string, path: string): Promise<string> {
@@ -95,15 +95,15 @@ async function readConfinedFile(
   );
   try {
     const before = await handle.stat();
-    if (!before.isFile()) throw new Error("剪映草稿路径不是普通文件");
-    if (before.size > limit) throw new Error("剪映草稿文件超过读取大小限制");
+    if (!before.isFile()) throw new Error("CapCut draft path is not a regular file");
+    if (before.size > limit) throw new Error("CapCut draft file exceeds the read size limit");
     // Revalidate after open as well: a directory/symlink may have changed while
     // resolving. Never read bytes until the open descriptor matches this path.
     const afterPath = await realpath(path);
     assertContained(root, afterPath);
     const visible = await stat(afterPath);
     if (before.dev !== visible.dev || before.ino !== visible.ino)
-      throw new Error("剪映草稿文件在读取前发生变化，请重试");
+      throw new Error("CapCut draft file changed before reading. Try again.");
     const chunks: Buffer[] = [];
     let length = 0;
     while (length <= limit) {
@@ -111,12 +111,12 @@ async function readConfinedFile(
       const { bytesRead } = await handle.read(buffer, 0, buffer.length, null);
       if (bytesRead === 0) break;
       length += bytesRead;
-      if (length > limit) throw new Error("剪映草稿文件超过读取大小限制");
+      if (length > limit) throw new Error("CapCut draft file exceeds the read size limit");
       chunks.push(buffer.subarray(0, bytesRead));
     }
     const after = await handle.stat();
     if (before.size !== after.size || before.mtimeMs !== after.mtimeMs)
-      throw new Error("剪映草稿文件在读取期间发生变化，请重试");
+      throw new Error("CapCut draft file changed while being read. Try again.");
     return Buffer.concat(chunks, length);
   } finally {
     await handle.close();
@@ -127,7 +127,7 @@ function utf8(buffer: Buffer): string {
   try {
     return new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(buffer);
   } catch {
-    throw new Error("剪映草稿包含非 UTF-8 字节，当前读取接口尚不支持该载体");
+    throw new Error("CapCut draft contains non-UTF-8 bytes, which this reader does not support");
   }
 }
 
@@ -152,7 +152,7 @@ export async function discoverSelectedCapcutProject(
   const selection = describeCapcutProjectSelection(selectedPath, kind);
   const root = await realpath(selection.projectDirectory);
   if (!(await stat(root)).isDirectory())
-    throw new Error("剪映项目路径不是目录");
+    throw new Error("CapCut project path is not a directory");
   const manifest = await optionalSidecar(root, selection.manifestPath);
   const layout =
     manifest === undefined
@@ -177,7 +177,7 @@ export async function readSelectedCapcutTimeline(
 ): Promise<{ text: string; name: string; path: string }> {
   const root = await realpath(plan.selection.projectDirectory);
   if (root !== plan.realProjectDirectory)
-    throw new Error("所选剪映项目目录已发生变化，请重新选择项目");
+    throw new Error("The selected CapCut project directory changed. Select the project again.");
   let path = selectCapcutTimelineDraft(plan, chosenTimelineId);
   let bytes: Buffer;
   try {

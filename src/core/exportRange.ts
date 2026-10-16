@@ -6,7 +6,7 @@ export function resolveExportRange(project: Project, options: Pick<ExportOptions
   if (!range || typeof range !== "object" || Array.isArray(range) || Object.keys(range).some(key => key !== "start" && key !== "end") ||
       typeof range.start !== "number" || typeof range.end !== "number" || !Number.isFinite(range.start) || !Number.isFinite(range.end) ||
       range.start < 0 || range.end > total + 1e-8 || range.end - range.start < 1 / options.fps - 1e-8)
-    throw new Error("导出区间必须位于时间线内，且至少包含一帧");
+    throw new Error("The export range must be within the timeline and include at least one frame.");
   return { start: range.start, end: Math.min(total, range.end), duration: Math.min(total, range.end) - range.start };
 }
 export function selectedClipRange(project: Project, ids: string[]): { start: number; end: number } | undefined {

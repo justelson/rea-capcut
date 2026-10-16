@@ -76,13 +76,13 @@ try {
   await expect(page.locator(".tl-clip")).toHaveCount(2);
   const save = async (): Promise<Project> => {
     const old = await stat(source).then((s) => s.mtimeMs);
-    await page.getByRole("button", { name: "保存项目", exact: true }).click();
+    await page.getByRole("button", { name: "Save project", exact: true }).click();
     await expect
       .poll(() => stat(source).then((s) => s.mtimeMs))
       .toBeGreaterThan(old);
     return JSON.parse(await readFile(source, "utf8"));
   };
-  await page.getByRole("button", { name: "文本", exact: true }).click();
+  await page.getByRole("button", { name: "Text", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(16);
   const preview = page.getByRole("button", {
     name: "预览弹跳登场",
@@ -98,13 +98,13 @@ try {
   await expect.poll(snapshot).not.toBe(first);
   checks.push("16 text recipes and animated canvas preview");
   await page
-    .getByRole("textbox", { name: "搜索预设", exact: true })
+    .getByRole("textbox", { name: "Search presets", exact: true })
     .fill("不存在的模板");
   await expect(
-    page.getByText("没有匹配的文字模板", { exact: true }),
+    page.getByText("No matching text templates", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("textbox", { name: "搜索预设", exact: true }).fill("");
-  await page.getByRole("tab", { name: "动态", exact: true }).click();
+  await page.getByRole("textbox", { name: "Search presets", exact: true }).fill("");
+  await page.getByRole("tab", { name: "Motion", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(4);
   await page
     .getByRole("button", { name: "添加弹跳登场模板", exact: true })
@@ -113,7 +113,7 @@ try {
   assert.equal(p.clips.length, 3);
   assert(p.clips.at(-1)?.text?.text === "HELLO！");
   assert.equal(p.clips.at(-1)?.keyframes.length, 3);
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   assert.equal((await save()).clips.length, 2);
   await page
     .getByRole("button", { name: "添加轻盈升起模板", exact: true })
@@ -121,19 +121,19 @@ try {
   p = await save();
   assert(p.clips.at(-1)?.text?.text.includes("新的故事"));
   checks.push("text category/search, editable animated text and one-step undo");
-  await page.getByRole("tab", { name: "全部", exact: true }).click();
+  await page.getByRole("tab", { name: "All", exact: true }).click();
   await page.locator(".player-panel .panel-heading").click();
   await page.keyboard.press("Home");
   for (let i = 0; i < 24; i++) await page.keyboard.press("ArrowRight");
   await page.screenshot({ path: path.join(output, "text-library.png") });
   const front = page.locator(`[data-clip-id="${project.clips[0].id}"]`);
   await front.click({ position: { x: 25, y: 20 } });
-  await page.getByRole("button", { name: "特效", exact: true }).click();
+  await page.getByRole("button", { name: "Effects", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(8);
   await page.getByRole("button", { name: "应用暖阳调色", exact: true }).click();
   p = await save();
   assert.equal(p.clips[0].adjustments.temperature, 0.3);
-  await page.getByRole("tab", { name: "动态特效", exact: true }).click();
+  await page.getByRole("tab", { name: "Motion effects", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(8);
   await page
     .getByRole("button", { name: "应用呼吸缩放特效", exact: true })
@@ -146,7 +146,7 @@ try {
   checks.push("8 color and 8 motion effects apply real adjustments/keyframes");
   await page.locator(".effects-content").evaluate(el => el.scrollTop = 0);
   await page.screenshot({ path: path.join(output, "effect-library.png") });
-  await page.getByRole("button", { name: "转场", exact: true }).click();
+  await page.getByRole("button", { name: "Transitions", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(8);
   await page
     .getByRole("spinbutton", { name: "转场时长", exact: true })
@@ -158,7 +158,7 @@ try {
   const next = p.clips.find((c) => c.id === project.clips[1].id)!;
   assert(Math.abs(next.start - (2 - 14 / 24)) < 1e-8);
   assert.equal(next.keyframes.filter((k) => k.property === "x").length, 2);
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   assert.equal((await save()).clips[1].start, 2);
   await front.click({ position: { x: 25, y: 20 } });
   await page
@@ -174,9 +174,9 @@ try {
   );
   await page.locator(".creative-scroll").evaluate((el) => (el.scrollTop = 0));
   await page.screenshot({ path: path.join(output, "transition-library.png") });
-  await page.getByRole("button", { name: "导出", exact: true }).click();
-  await page.getByRole("button", { name: "开始导出", exact: true }).click();
-  await expect(page.getByText("导出完成", { exact: true })).toBeVisible({
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await page.getByRole("button", { name: "Start export", exact: true }).click();
+  await expect(page.getByText("Export complete", { exact: true })).toBeVisible({
     timeout: 120000,
   });
   const info = await page.evaluate(() => window.editorAPI!.getSystemInfo());

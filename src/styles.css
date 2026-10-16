@@ -7,6 +7,8 @@
 :root {
   color-scheme: dark;
   font-family:
+    "Segoe UI Variable",
+    "Segoe UI",
     Inter,
     -apple-system,
     BlinkMacSystemFont,
@@ -159,20 +161,6 @@ h3:first-child {
   padding: 0 8px;
   background: #151515;
 }
-.titlebar {
-  height: 44px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 0 8px 0 74px;
-  -webkit-app-region: drag;
-  position: relative;
-}
-.titlebar button,
-.titlebar input,
-.titlebar-menus {
-  -webkit-app-region: no-drag;
-}
 .brand {
   display: flex;
   align-items: center;
@@ -194,12 +182,6 @@ h3:first-child {
   letter-spacing: -0.4px;
   color: #f0f2f7;
 }
-.brand-cn {
-  font-size: 10px;
-  color: #78808e;
-  border-left: 1px solid #353842;
-  padding-left: 8px;
-}
 .titlebar-menus {
   display: flex;
   gap: 4px;
@@ -209,20 +191,15 @@ h3:first-child {
   font-size: 11px;
 }
 .project-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   align-items: center;
   gap: 8px;
-  max-width: 250px;
 }
 .project-title input {
   text-align: center;
   border-color: transparent;
   background: transparent;
   padding: 6px;
-  width: 200px;
   font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -243,7 +220,6 @@ h3:first-child {
   background: #ecb962;
 }
 .titlebar-actions {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1256,13 +1232,6 @@ kbd {
   .editor-workspace {
     grid-template-columns: minmax(280px, 32%) minmax(220px, 1fr) 292px;
   }
-  .offline-pill,
-  .brand-cn {
-    display: none;
-  }
-  .titlebar {
-    gap: 10px;
-  }
   .timecode {
     font-size: 9px;
   }
@@ -1298,9 +1267,6 @@ kbd {
   .resource-tabs button {
     height: 44px;
     gap: 5px;
-  }
-  .titlebar {
-    height: 44px;
   }
 }
 
@@ -1355,11 +1321,7 @@ kbd {
 @media (max-width: 1100px) {
   .editor-workspace { grid-template-columns: 280px minmax(210px, 1fr) 280px; }
   .editor-workspace.assistant-open { grid-template-columns: 280px minmax(200px, 1fr) 310px; }
-  .titlebar { padding-left: 68px; gap: 8px; }
   .titlebar-menus { gap: 0; }
-  .project-title { max-width: 170px; left: 52%; }
-  .project-title input { width: 145px; }
-  .titlebar-actions { gap: 2px; }
   .resource-tabs { padding-inline: 5px; gap: 0; }
   .resource-tabs button { min-width: 35px; font-size: 10px; }
   .timecode { font-size: 9px; }

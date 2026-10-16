@@ -26,7 +26,7 @@ describe("assistant atomic edit proposals", () => {
       { type: "setVolume", clipId: "clip", volume: .4 },
       { type: "addText", text: "新增", start: 0, duration: 2 },
       { type: "deleteClip", clipId: "missing" },
-    ])).toThrow("不存在");
+    ])).toThrow("no longer exists");
     expect(p).toEqual(snapshot);
   });
   it("applies a multi-action proposal as one reversible history entry", () => {
@@ -48,10 +48,10 @@ describe("assistant atomic edit proposals", () => {
   it("blocks changes to locked source tracks and locked/incompatible destinations", () => {
     const p = fixture(); p.tracks[1].locked = true;
     for (const action of [{ type: "deleteClip", clipId: "clip" }, { type: "setVolume", clipId: "clip", volume: 0 }, { type: "splitClip", clipId: "clip", time: 5 }])
-      expect(() => previewAssistantEdits(p, [action])).toThrow("锁定");
-    expect(() => previewAssistantEdits(p, [{ type: "addAsset", assetId: "asset", start: 0, trackId: p.tracks[1].id }])).toThrow("锁定");
+      expect(() => previewAssistantEdits(p, [action])).toThrow("is locked");
+    expect(() => previewAssistantEdits(p, [{ type: "addAsset", assetId: "asset", start: 0, trackId: p.tracks[1].id }])).toThrow("is locked");
     p.tracks[1].locked = false;
-    expect(() => previewAssistantEdits(p, [{ type: "moveClip", clipId: "clip", start: 0, trackId: p.tracks[0].id }])).toThrow("不兼容");
+      expect(() => previewAssistantEdits(p, [{ type: "moveClip", clipId: "clip", start: 0, trackId: p.tracks[0].id }])).toThrow("incompatible");
   });
   it.each([
     { type: "execute", code: "do not execute" }, { type: "setVolume", clipId: "clip", volume: 1, path: "/tmp/no" },
@@ -99,9 +99,9 @@ describe("assistant atomic edit proposals", () => {
   });
   it("does not silently ignore an explicit property change because keyframes override it", () => {
     const p = fixture();
-    expect(() => previewAssistantEdits(p, [{ type: "setTransform", clipId: "clip", x: 200 }])).toThrow("关键帧");
+    expect(() => previewAssistantEdits(p, [{ type: "setTransform", clipId: "clip", x: 200 }])).toThrow("have keyframes");
     p.clips[0].keyframes.push({ id: "volume-key", property: "volume", time: 0, value: .5, easing: "linear" });
-    expect(() => previewAssistantEdits(p, [{ type: "setVolume", clipId: "clip", volume: .1 }])).toThrow("关键帧");
+    expect(() => previewAssistantEdits(p, [{ type: "setVolume", clipId: "clip", volume: .1 }])).toThrow("volume keyframes");
     expect(previewAssistantEdits(p, [{ type: "setTransform", clipId: "clip", y: 100 }]).project.clips[0].transform.y).toBe(100);
   });
   it("shows actual values and target tracks in review descriptions", () => {
@@ -113,8 +113,8 @@ describe("assistant atomic edit proposals", () => {
       { type: "moveClip", clipId: "clip", start: 4, trackId: track.id },
       { type: "setProject", name: "成片", background: "#123456" },
     ]);
-    expect(preview.descriptions[0]).toContain("Y 60"); expect(preview.descriptions[0]).toContain("旋转 30°"); expect(preview.descriptions[0]).toContain("缩放 0.8×");
-    expect(preview.descriptions[1]).toContain("画面淡入 1s · 淡出 2s · 声音淡入 0.5s · 淡出 0.75s");
+    expect(preview.descriptions[0]).toContain("Y 60"); expect(preview.descriptions[0]).toContain("Rotation 30°"); expect(preview.descriptions[0]).toContain("Scale 0.8×");
+    expect(preview.descriptions[1]).toContain("Video fade in 1s · fade out 2s · Audio fade in 0.5s · fade out 0.75s");
     expect(preview.descriptions[2]).toContain("目标轨"); expect(preview.descriptions[2]).toContain("4.00s");
     expect(preview.descriptions[3]).toContain("成片"); expect(preview.descriptions[3]).toContain("#123456");
   });

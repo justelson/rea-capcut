@@ -52,9 +52,9 @@ const launch = async () => {
       (dialog as any).showOpenDialog = async (...args: any[]) => {
         const options = args[args.length - 1];
         const file =
-          options.title === "导入素材"
+          options.title === "Import media"
             ? p.video
-            : options.title === "打开 ReaCut 项目"
+            : options.title === "Open ReaCut project"
               ? p.saved
               : p.backup;
         if (g.deferOpen)
@@ -85,14 +85,14 @@ const setName = async (name: string) => {
 const addText = async (text: string) => {
   await page
     .locator(".resource-tabs")
-    .getByRole("button", { name: "文本", exact: true })
+    .getByRole("button", { name: "Text", exact: true })
     .click();
-  await page.getByRole("button", { name: "添加文本", exact: true }).click();
-  await page.getByRole("textbox", { name: "文字内容", exact: true }).fill(text);
-  await page.getByRole("textbox", { name: "文字内容", exact: true }).blur();
+  await page.getByRole("button", { name: "Add text", exact: true }).click();
+  await page.getByRole("textbox", { name: "Text", exact: true }).fill(text);
+  await page.getByRole("textbox", { name: "Text", exact: true }).blur();
 };
 const save = async () => {
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect(page.locator(".save-dot")).not.toHaveClass(/dirty/);
   return read();
 };
@@ -102,7 +102,7 @@ try {
   await app.evaluate(() => {
     (globalThis as any).deferSave = true;
   });
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect
     .poll(() => app.evaluate(() => Boolean((globalThis as any).releaseSave)))
     .toBe(true);
@@ -150,7 +150,7 @@ try {
   await app.close();
   await launch();
   await expect(
-    page.getByRole("dialog", { name: "恢复上次编辑", exact: true }),
+    page.getByRole("dialog", { name: "Restore previous session", exact: true }),
   ).toBeVisible();
   await page.getByRole("button", { name: "恢复项目", exact: true }).click();
   await expect(page.locator(".project-title input")).toHaveValue(
@@ -161,7 +161,7 @@ try {
   );
   await page
     .locator(".resource-tabs")
-    .getByRole("button", { name: "素材", exact: true })
+    .getByRole("button", { name: "Media", exact: true })
     .click();
   await page.locator(".media-import").click();
   await expect(page.locator(".media-item")).toHaveCount(1, { timeout: 30000 });
@@ -170,16 +170,16 @@ try {
   await page.locator(`[data-asset-id="${video.id}"]`).dblclick();
   project = await save();
   await rm(fixture.video);
-  await page.getByRole("button", { name: "文件菜单", exact: true }).click();
-  await page.getByRole("button", { name: "打开项目", exact: false }).click();
+  await page.getByRole("button", { name: "File menu", exact: true }).click();
+  await page.getByRole("button", { name: "Open project", exact: false }).click();
   await expect(
-    page.getByRole("button", { name: "重新链接丢失素材", exact: true }),
+    page.getByRole("button", { name: "Relink missing media", exact: true }),
   ).toBeVisible();
   await app.evaluate(() => {
     (globalThis as any).deferOpen = true;
   });
   await page
-    .getByRole("button", { name: "重新链接丢失素材", exact: true })
+    .getByRole("button", { name: "Relink missing media", exact: true })
     .click();
   await expect
     .poll(() => app.evaluate(() => Boolean((globalThis as any).releaseOpen)))
@@ -190,7 +190,7 @@ try {
     (globalThis as any).deferOpen = false;
   });
   await expect(
-    page.getByRole("button", { name: "重新链接丢失素材", exact: true }),
+    page.getByRole("button", { name: "Relink missing media", exact: true }),
   ).toHaveCount(0, { timeout: 30000 });
   project = await save();
   assert.equal(project.assets[0].path, backup);
@@ -200,13 +200,13 @@ try {
     (globalThis as any).deferSave = true;
     (globalThis as any).releaseSave = undefined;
   });
-  await page.getByRole("button", { name: "文件菜单", exact: true }).click();
-  await page.getByRole("button", { name: "另存为", exact: false }).click();
+  await page.getByRole("button", { name: "File menu", exact: true }).click();
+  await page.getByRole("button", { name: "Save as…", exact: false }).click();
   await expect
     .poll(() => app.evaluate(() => Boolean((globalThis as any).releaseSave)))
     .toBe(true);
-  await page.getByRole("button", { name: "文件菜单", exact: true }).click();
-  await page.getByRole("button", { name: "新建项目", exact: false }).click();
+  await page.getByRole("button", { name: "File menu", exact: true }).click();
+  await page.getByRole("button", { name: "New Project", exact: false }).click();
   await app.evaluate(() => {
     (globalThis as any).releaseSave();
     (globalThis as any).deferSave = false;
@@ -219,7 +219,7 @@ try {
     (globalThis as any).deferSave = true;
     (globalThis as any).releaseSave = undefined;
   });
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect
     .poll(() => app.evaluate(() => Boolean((globalThis as any).releaseSave)))
     .toBe(true);

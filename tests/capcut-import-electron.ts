@@ -168,10 +168,10 @@ try {
   await page.evaluate((token) => window.editorAPI!.discardCapcutProject(token), canceledSelection.token);
   assert.match(await rejection(canceledSelection.token, "active"), /已失效/);
   const openMenuImport = async (label: string) => {
-    await page!.getByRole("button", { name: "文件菜单", exact: true }).click();
+    await page!.getByRole("button", { name: "File menu", exact: true }).click();
     await page!.getByRole("button", { name: label, exact: false }).click();
   };
-  const chooser = page.getByRole("dialog", { name: "选择剪映时间线", exact: true });
+  const chooser = page.getByRole("dialog", { name: "Choose CapCut timeline", exact: true });
   const initialName = await page.locator(".project-title input").inputValue();
   await openMenuImport("导入剪映项目文件夹");
   await expect(chooser).toBeVisible();
@@ -202,7 +202,7 @@ try {
     return pixel[0] > 180 && pixel[1] < 70 && pixel[2] < 70 && pixel[3] > 200;
   }), { timeout: 15_000 }).toBe(true);
   await page.screenshot({ path: path.join(output, "opaque-import-editor.png") });
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect(page.locator(".save-dot")).not.toHaveClass(/dirty/);
   const imported: Project = JSON.parse(await readFile(saved, "utf8"));
   assert.equal(imported.clips.length, 1);
@@ -221,7 +221,7 @@ try {
   await expect(chooser).toHaveCount(0);
   await page.locator(".project-title input").fill("保留当前编辑");
   await page.locator(".project-title input").blur();
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect(page.locator(".save-dot")).not.toHaveClass(/dirty/);
   const preservedProject: Project = JSON.parse(await readFile(saved, "utf8"));
   assert.equal(preservedProject.name, "保留当前编辑");
@@ -231,7 +231,7 @@ try {
   await expect(page.locator(".project-title input")).toHaveValue("保留当前编辑");
   await expect(page.locator(".media-item")).toHaveCount(1);
   await page.screenshot({ path: path.join(output, "tampered-carrier-preserved.png") });
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect(page.locator(".save-dot")).not.toHaveClass(/dirty/);
   assert.deepEqual(JSON.parse(await readFile(saved, "utf8")), preservedProject,
     "Failed authentication must not replace the current timeline, media or edits");

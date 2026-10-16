@@ -79,7 +79,7 @@ describe("bounded read-only Capcut project loader", () => {
     expect(plan.timelines).toHaveLength(2);
     expect(plan.mainTimelineId).toBe(main);
     expect(plan.activeTimelineId).toBe(active);
-    await expect(readSelectedCapcutTimeline(plan)).rejects.toThrow("明确选择");
+    await expect(readSelectedCapcutTimeline(plan)).rejects.toThrow("Choose which one to import");
     expect(await readSelectedCapcutTimeline(plan, active)).toEqual({
       text: nativePayload,
       name: "实际剪辑时间线",
@@ -165,17 +165,17 @@ describe("bounded read-only Capcut project loader", () => {
       "directory",
     );
     expect(malformedLayout.warnings).toContain(
-      "时间线布局无法验证，已忽略活动时间线提示。",
+      "Could not verify the timeline layout. Ignored the active timeline hint.",
     );
     await writeFile(join(project, "Timelines", "project.json"), "{malformed");
     await expect(
       discoverSelectedCapcutProject(project, "directory"),
-    ).rejects.toThrow("不是可读取的 JSON");
+    ).rejects.toThrow("not readable JSON");
     await rm(join(project, "Timelines", "project.json"));
     await mkdir(join(project, "Timelines", "project.json"));
     await expect(
       discoverSelectedCapcutProject(project, "directory"),
-    ).rejects.toThrow("不是普通文件");
+    ).rejects.toThrow("not a regular file");
   });
 
   it("enforces byte limits for sidecars and payloads before decoding", async () => {
@@ -186,12 +186,12 @@ describe("bounded read-only Capcut project loader", () => {
     );
     await expect(
       discoverSelectedCapcutProject(project, "directory"),
-    ).rejects.toThrow("大小限制");
+    ).rejects.toThrow("read size limit");
     await createModern();
     await oversized(join(project, "timeline_layout.json"), CAPCUT_SIDECAR_MAX_BYTES);
     await expect(
       discoverSelectedCapcutProject(project, "directory"),
-    ).rejects.toThrow("大小限制");
+    ).rejects.toThrow("read size limit");
     await rm(join(project, "timeline_layout.json"));
     const plan = await discoverSelectedCapcutProject(project, "directory");
     await oversized(
@@ -199,7 +199,7 @@ describe("bounded read-only Capcut project loader", () => {
       CAPCUT_DRAFT_MAX_BYTES,
     );
     await expect(readSelectedCapcutTimeline(plan, active)).rejects.toThrow(
-      "大小限制",
+      "read size limit",
     );
   });
 
@@ -207,13 +207,13 @@ describe("bounded read-only Capcut project loader", () => {
     await mkdir(join(project, "draft_info.json"));
     await writeFile(join(project, "draft_content.json"), "not-a-fallback");
     const plan = await discoverSelectedCapcutProject(project, "directory");
-    await expect(readSelectedCapcutTimeline(plan)).rejects.toThrow("不是普通文件");
+    await expect(readSelectedCapcutTimeline(plan)).rejects.toThrow("not a regular file");
   });
 
   it("diagnoses non-UTF8 carriers rather than silently replacing bytes", async () => {
     await writeFile(join(project, "draft_info.json"), Buffer.from([0xff, 0xfe, 0x00]));
     const plan = await discoverSelectedCapcutProject(project, "directory");
-    await expect(readSelectedCapcutTimeline(plan)).rejects.toThrow("非 UTF-8");
+    await expect(readSelectedCapcutTimeline(plan)).rejects.toThrow("non-UTF-8 bytes");
   });
 
   it.skipIf(process.platform === "win32")(
@@ -231,7 +231,7 @@ describe("bounded read-only Capcut project loader", () => {
         await symlink(outside, target);
         await expect(
           discoverSelectedCapcutProject(project, "directory"),
-        ).rejects.toThrow("逃离");
+    ).rejects.toThrow("escapes the selected project directory");
         await rm(target);
         await writeFile(target, original);
       }
@@ -239,7 +239,7 @@ describe("bounded read-only Capcut project loader", () => {
       const target = join(project, "Timelines", active, "draft_info.json");
       await rm(target);
       await symlink(outside, target);
-      await expect(readSelectedCapcutTimeline(plan, active)).rejects.toThrow("逃离");
+  await expect(readSelectedCapcutTimeline(plan, active)).rejects.toThrow("escapes the selected project directory");
     },
   );
 
@@ -254,7 +254,7 @@ describe("bounded read-only Capcut project loader", () => {
       await writeFile(join(project, "draft_info.json"), "must-not-use-root");
       await expect(
         discoverSelectedCapcutProject(project, "directory"),
-      ).rejects.toThrow("逃离");
+    ).rejects.toThrow("escapes the selected project directory");
     },
   );
 

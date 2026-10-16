@@ -37,12 +37,12 @@ export default function SubtitlePanel({ onImport, onExport }: Props) {
 
   useEffect(() => {
     const textTracks = project.tracks.filter(t => t.kind === "text");
-    const preferred = textTracks.find(t => t.name.includes("字幕")) ?? textTracks[0];
+    const preferred = textTracks.find(t => t.name.includes("Captions") || t.name.includes("字幕")) ?? textTracks[0];
     setTrackId(preferred?.id ?? ""); setQuery(""); setChecked([]); setDraft(null); setPlan(null); setError(""); setNotice("");
   }, [project.id]);
   useEffect(() => {
     if (!project.tracks.some(t => t.id === trackId && t.kind === "text")) {
-      const preferred = project.tracks.find(t => t.kind === "text" && t.name.includes("字幕")) ?? project.tracks.find(t => t.kind === "text");
+      const preferred = project.tracks.find(t => t.kind === "text" && (t.name.includes("Captions") || t.name.includes("字幕"))) ?? project.tracks.find(t => t.kind === "text");
       setTrackId(preferred?.id ?? "");
     }
     // Newly imported cues become selected in the editor; follow their new track.
@@ -70,23 +70,23 @@ export default function SubtitlePanel({ onImport, onExport }: Props) {
   function saveCue() {
     attempt(() => {
       if (!draft) return;
-      if (!draft.start.trim() || !draft.end.trim()) throw new Error("请填写开始和结束时间");
+      if (!draft.start.trim() || !draft.end.trim()) throw new Error("Enter a start and end time.");
       const next = prepareSubtitleEdit(draft.project, [draft.id], { type: "cue", text: draft.text, start: Number(draft.start), end: Number(draft.end) });
       const store = useEditorStore.getState();
       store.commit(applySubtitleEdit(store.project, next));
-      setDraft(null); setNotice(next.changedIds.length ? "字幕已保存，可一次撤销" : "字幕未变化");
+      setDraft(null); setNotice(next.changedIds.length ? "Captions saved. Undo to revert." : "Captions unchanged");
     });
   }
   function prepare() {
     attempt(() => {
       let edit: SubtitleEdit;
       if (mode === "offset") {
-        if (!offset.trim()) throw new Error("请填写时间偏移量");
+        if (!offset.trim()) throw new Error("Enter a time offset.");
         edit = { type: "offset", seconds: Number(offset) };
       } else if (mode === "replace") edit = { type: "replace", find, replacement };
       else edit = { type: "style", referenceId };
       const next = prepareSubtitleEdit(useEditorStore.getState().project, selected, edit);
-      if (!next.changedIds.length) { setPlan(null); setNotice("没有需要修改的字幕"); return; }
+      if (!next.changedIds.length) { setPlan(null); setNotice("No captions to change"); return; }
       setPlan(next);
     });
   }
@@ -95,57 +95,57 @@ export default function SubtitlePanel({ onImport, onExport }: Props) {
       if (!plan) return;
       const store = useEditorStore.getState();
       store.commit(applySubtitleEdit(store.project, plan));
-      setNotice(`已修改 ${plan.changedIds.length} 条字幕，可一次撤销`); setPlan(null); setDraft(null);
+      setNotice(`Updated ${plan.changedIds.length} captions. Undo to revert.`); setPlan(null); setDraft(null);
     });
   }
   function setSelection(ids: string[]) { setChecked(ids); setPlan(null); }
   const draftStale = draft && JSON.stringify(draft.project) !== JSON.stringify(project);
 
-  return <section className="subtitle-panel" aria-label="字幕编辑器">
-    <div className="subtitle-heading"><h3>字幕编辑</h3><span>{clips.length} 条</span></div>
+  return <section className="subtitle-panel" aria-label="Caption editor">
+    <div className="subtitle-heading"><h3>Edit captions</h3><span>{clips.length} captions</span></div>
     <div className="subtitle-file-actions">
-      <button className="small-button" onClick={() => void fileAction(onImport)}><FolderOpen size={14} />导入字幕文件</button>
-      <button className="small-button" onClick={() => void fileAction(onExport)} disabled={!project.clips.some(c => c.text)} title="导出项目中全部文字片段为 SRT"><Download size={14} />导出全部 SRT</button>
+      <button className="small-button" onClick={() => void fileAction(onImport)}><FolderOpen size={14} /> Import caption file</button>
+      <button className="small-button" onClick={() => void fileAction(onExport)} disabled={!project.clips.some(c => c.text)} title="Export all text clips in the project as SRT"><Download size={14} /> Export all SRT</button>
     </div>
-    <label className="subtitle-track-label">文字轨道
-      <select aria-label="字幕轨道" value={trackId} onChange={e => setTrackId(e.target.value)}>
-        {!tracks.length && <option value="">暂无文字轨道</option>}
-        {tracks.map(t => <option key={t.id} value={t.id}>{t.name}{t.locked ? " · 已锁定" : ""}</option>)}
+    <label className="subtitle-track-label">Text track
+      <select aria-label="Caption track" value={trackId} onChange={e => setTrackId(e.target.value)}>
+        {!tracks.length && <option value="">No text tracks</option>}
+        {tracks.map(t => <option key={t.id} value={t.id}>{t.name}{t.locked ? " · Locked" : ""}</option>)}
       </select>
     </label>
-    <label className="subtitle-search"><Search size={14} /><input aria-label="搜索字幕" placeholder="搜索当前轨道字幕" value={query} onChange={e => setQuery(e.target.value)} /></label>
+    <label className="subtitle-search"><Search size={14} /><input aria-label="Search captions" placeholder="Search captions on this track" value={query} onChange={e => setQuery(e.target.value)} /></label>
     <div className="subtitle-selection">
-      <label><input type="checkbox" aria-label="选择搜索结果" disabled={locked || !visible.length} checked={visible.length > 0 && visible.every(c => selected.includes(c.id))} onChange={e => setSelection(e.target.checked ? [...new Set([...selected, ...visible.map(c => c.id)])] : selected.filter(id => !visible.some(c => c.id === id)))} />选择搜索结果</label>
-      <button className="subtitle-clear" disabled={!selected.length} onClick={() => setSelection([])}>清空 ({selected.length})</button>
+      <label><input type="checkbox" aria-label="Select search results" disabled={locked || !visible.length} checked={visible.length > 0 && visible.every(c => selected.includes(c.id))} onChange={e => setSelection(e.target.checked ? [...new Set([...selected, ...visible.map(c => c.id)])] : selected.filter(id => !visible.some(c => c.id === id)))} />Select search results</label>
+      <button className="subtitle-clear" disabled={!selected.length} onClick={() => setSelection([])}>Clear ({selected.length})</button>
     </div>
-    {locked && <p className="subtitle-hint"><LockKeyhole size={13} />此轨道已锁定，仍可定位和查看字幕。</p>}
+    {locked && <p className="subtitle-hint"><LockKeyhole size={13} />This track is locked. You can still locate and view captions.</p>}
     <div className="subtitle-cues">
-      {!visible.length && <div className="subtitle-empty"><Subtitles size={27} /><p>{clips.length ? "没有匹配的字幕" : "导入 SRT / WebVTT，或选择含字幕的文字轨道"}</p></div>}
+      {!visible.length && <div className="subtitle-empty"><Subtitles size={27} /><p>{clips.length ? "No matching captions" : "Import SRT / WebVTT or select a text track with captions"}</p></div>}
       {visible.map((clip) => <div key={clip.id} className={`subtitle-cue ${draft?.id === clip.id ? "active" : ""}`} data-cue-id={clip.id}>
         <div className="subtitle-cue-line">
-          <input type="checkbox" aria-label={`选择字幕：${clip.text!.text.slice(0, 40)}`} checked={selected.includes(clip.id)} disabled={locked} onChange={e => setSelection(e.target.checked ? [...selected, clip.id] : selected.filter(id => id !== clip.id))} />
-          <button className="subtitle-cue-content" onClick={() => editCue(clip)} title="定位到此字幕并编辑"><span className="subtitle-time">{timeLabel(clip.start)} — {timeLabel(clip.start + clip.duration)}</span><span>{clip.text!.text || "（空字幕）"}</span></button>
+          <input type="checkbox" aria-label={`Select caption: ${clip.text!.text.slice(0, 40)}`} checked={selected.includes(clip.id)} disabled={locked} onChange={e => setSelection(e.target.checked ? [...selected, clip.id] : selected.filter(id => id !== clip.id))} />
+          <button className="subtitle-cue-content" onClick={() => editCue(clip)} title="Go to and edit this caption"><span className="subtitle-time">{timeLabel(clip.start)} — {timeLabel(clip.start + clip.duration)}</span><span>{clip.text!.text || "(Empty caption)"}</span></button>
         </div>
         {draft?.id === clip.id && <div className="subtitle-cue-form">
-          <textarea aria-label="字幕内容" value={draft.text} maxLength={20000} disabled={locked} onChange={e => setDraft({ ...draft, text: e.target.value })} />
+          <textarea aria-label="Caption text" value={draft.text} maxLength={20000} disabled={locked} onChange={e => setDraft({ ...draft, text: e.target.value })} />
           <div className="subtitle-times">
-            <label>开始 (秒)<input aria-label="字幕开始时间" type="number" min="0" max="86400" step={1 / project.fps} value={draft.start} disabled={locked} onChange={e => setDraft({ ...draft, start: e.target.value })} /></label>
-            <label>结束 (秒)<input aria-label="字幕结束时间" type="number" min="0" max="86400" step={1 / project.fps} value={draft.end} disabled={locked} onChange={e => setDraft({ ...draft, end: e.target.value })} /></label>
+            <label>Start (sec)<input aria-label="Caption start time" type="number" min="0" max="86400" step={1 / project.fps} value={draft.start} disabled={locked} onChange={e => setDraft({ ...draft, start: e.target.value })} /></label>
+            <label>End (sec)<input aria-label="Caption end time" type="number" min="0" max="86400" step={1 / project.fps} value={draft.end} disabled={locked} onChange={e => setDraft({ ...draft, end: e.target.value })} /></label>
           </div>
-          {draftStale && <p className="subtitle-warning">项目已变化，重新点击此条字幕后再编辑。</p>}
-          <div className="subtitle-draft-actions"><button className="small-button" onClick={() => setDraft(null)}>取消</button><button className="primary small-button" disabled={locked || !!draftStale} onClick={saveCue}>保存此条</button></div>
+          {draftStale && <p className="subtitle-warning">The project has changed. Select this caption again to edit it.</p>}
+          <div className="subtitle-draft-actions"><button className="small-button" onClick={() => setDraft(null)}>Cancel</button><button className="primary small-button" disabled={locked || !!draftStale} onClick={saveCue}>Save caption</button></div>
         </div>}
       </div>)}
     </div>
     <div className="subtitle-batch">
-      <div className="subtitle-heading"><h4>批量修改</h4><span>已选 {selected.length} 条</span></div>
-      <div className="subtitle-batch-tabs" role="tablist" aria-label="字幕批量操作">
-        {([['offset', '时间偏移'], ['replace', '查找替换'], ['style', '统一样式']] as const).map(([key, label]) => <button key={key} role="tab" aria-selected={mode === key} className={mode === key ? "active" : ""} onClick={() => { setMode(key); setPlan(null); }}>{label}</button>)}
+      <div className="subtitle-heading"><h4>Bulk edit</h4><span>{selected.length} selected</span></div>
+      <div className="subtitle-batch-tabs" role="tablist" aria-label="Bulk caption actions">
+        {([['offset', 'Time offset'], ['replace', 'Find and replace'], ['style', 'Match style']] as const).map(([key, label]) => <button key={key} role="tab" aria-selected={mode === key} className={mode === key ? "active" : ""} onClick={() => { setMode(key); setPlan(null); }}>{label}</button>)}
       </div>
-      {mode === "offset" && <label className="subtitle-batch-field">偏移秒数（负数提前）<input aria-label="字幕偏移秒数" type="number" step={1 / project.fps} value={offset} onChange={e => { setOffset(e.target.value); setPlan(null); }} /></label>}
-      {mode === "replace" && <div className="subtitle-replace"><input aria-label="查找字幕文字" placeholder="查找文字（区分大小写）" value={find} onChange={e => { setFind(e.target.value); setPlan(null); }} /><input aria-label="替换字幕文字" placeholder="替换为（可留空）" value={replacement} onChange={e => { setReplacement(e.target.value); setPlan(null); }} /></div>}
-      {mode === "style" && <><label className="subtitle-batch-field">样式参考字幕<select aria-label="字幕样式参考" value={referenceId} onChange={e => { setReferenceId(e.target.value); setPlan(null); }}><option value="">选择参考字幕</option>{clips.map(c => <option key={c.id} value={c.id}>{timeLabel(c.start)} · {c.text!.text.slice(0, 30) || "空字幕"}</option>)}</select></label><p className="subtitle-hint">复制字体、字号、颜色、描边与对齐；保留每条文案、位置和动画。</p></>}
-      {plan ? <div className="subtitle-plan"><p>{stale ? "项目已变化，请重新检查修改。" : `将修改 ${plan.changedIds.length} 条字幕，可一次撤销。`}</p><div><button className="small-button" onClick={prepare}>重新检查</button><button className="primary small-button" disabled={stale || locked} onClick={apply}>应用 {plan.changedIds.length} 条修改</button></div></div> : <button className="small-button subtitle-check" disabled={!selected.length || locked} onClick={prepare}>检查修改</button>}
+      {mode === "offset" && <label className="subtitle-batch-field">Offset in seconds (negative moves earlier)<input aria-label="Caption offset in seconds" type="number" step={1 / project.fps} value={offset} onChange={e => { setOffset(e.target.value); setPlan(null); }} /></label>}
+      {mode === "replace" && <div className="subtitle-replace"><input aria-label="Find caption text" placeholder="Find text (case-sensitive)" value={find} onChange={e => { setFind(e.target.value); setPlan(null); }} /><input aria-label="Replace caption text" placeholder="Replace with (leave blank to remove)" value={replacement} onChange={e => { setReplacement(e.target.value); setPlan(null); }} /></div>}
+      {mode === "style" && <><label className="subtitle-batch-field">Style reference<select aria-label="Caption style reference" value={referenceId} onChange={e => { setReferenceId(e.target.value); setPlan(null); }}><option value="">Choose a reference caption</option>{clips.map(c => <option key={c.id} value={c.id}>{timeLabel(c.start)} · {c.text!.text.slice(0, 30) || "Empty caption"}</option>)}</select></label><p className="subtitle-hint">Copy the font, size, color, outline, and alignment. Keep each caption text, position, and animation.</p></>}
+      {plan ? <div className="subtitle-plan"><p>{stale ? "The project has changed. Review the changes again." : `Update ${plan.changedIds.length} captions. Undo to revert.`}</p><div><button className="small-button" onClick={prepare}>Review again</button><button className="primary small-button" disabled={stale || locked} onClick={apply}>Apply {plan.changedIds.length} changes</button></div></div> : <button className="small-button subtitle-check" disabled={!selected.length || locked} onClick={prepare}>Review changes</button>}
     </div>
     {error && <p ref={feedback} className="subtitle-error" role="alert">{error}</p>}
     {notice && <p className="subtitle-notice" role="status">{notice}</p>}

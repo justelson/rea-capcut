@@ -12,6 +12,6 @@ it('preserves exact source range, start, selection and atomic undo including new
  state().redo();expect(state().project.clips[0].sourceIn).toBe(3);
 });
 it.each([{sourceIn:-1,duration:1},{sourceIn:0,duration:0},{sourceIn:4,duration:.1},{sourceIn:NaN,duration:1},{sourceIn:1,duration:Infinity}])('rejects invalid range without partial edits %j',range=>{
- const before=state().project;expect(()=>state().addAssetClip('v',0,undefined,range)).toThrow('选段');expect(state().project).toBe(before);expect(state().past).toHaveLength(0);
+ const before=state().project;expect(()=>state().addAssetClip('v',0,undefined,range)).toThrow('selected asset range');expect(state().project).toBe(before);expect(state().past).toHaveLength(0);
 });
 it('does not add a selection to an explicitly locked destination',()=>{const p=state().project;p.tracks[1].locked=true;state().setProject(p);state().addAssetClip('v',0,p.tracks[1].id,{sourceIn:1,duration:1});expect(state().project.clips).toHaveLength(0);expect(state().past).toHaveLength(0);});

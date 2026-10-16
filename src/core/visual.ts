@@ -30,7 +30,7 @@ export function getCropPixels(
 
 function keyRGB(key: ChromaKey): [number, number, number] {
   if (!/^#[\da-f]{6}$/i.test(key.color))
-    throw new Error("抠像颜色必须为 #RRGGBB。");
+    throw new Error("The key color must use #RRGGBB format.");
   return [1, 3, 5].map((index) =>
     Number.parseInt(key.color.slice(index, index + 2), 16),
   ) as [number, number, number];

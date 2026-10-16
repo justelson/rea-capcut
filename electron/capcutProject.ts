@@ -49,7 +49,7 @@ function timelineId(value: unknown): string {
     !/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value) ||
     /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i.test(value)
   )
-    throw new Error("剪映时间线 ID 不是安全的目录名称");
+    throw new Error("CapCut timeline ID is not a safe directory name");
   return value;
 }
 
@@ -64,10 +64,10 @@ export function describeCapcutProjectSelection(
     selectedPath.length > 4096 ||
     (selectedKind !== "file" && selectedKind !== "directory")
   )
-    throw new Error("剪映项目选择无效");
+    throw new Error("Invalid CapCut project selection");
   const paths = pathApi(selectedPath);
   if (!paths.isAbsolute(selectedPath))
-    throw new Error("请选择剪映项目的本机绝对路径");
+    throw new Error("Select an absolute path to a local CapCut project");
   const normalized = paths.normalize(selectedPath);
   const folder =
     selectedKind === "directory" ? normalized : paths.dirname(normalized);
@@ -104,20 +104,20 @@ function readSidecar(value: unknown, description: string): JsonObject {
   try {
     serialized = typeof value === "string" ? value : JSON.stringify(value);
   } catch {
-    throw new Error(`${description}不是可读取的 JSON`);
+    throw new Error(`${description} is not readable JSON`);
   }
   if (
     typeof serialized !== "string" ||
     Buffer.byteLength(serialized, "utf8") > CAPCUT_SIDECAR_MAX_BYTES
   )
-    throw new Error(`${description}超过读取大小限制`);
+    throw new Error(`${description} exceeds the read size limit`);
   let parsed: unknown;
   try {
     parsed = JSON.parse(serialized.replace(/^\uFEFF/, ""));
   } catch {
-    throw new Error(`${description}不是可读取的 JSON`);
+    throw new Error(`${description} is not readable JSON`);
   }
-  if (!object(parsed)) throw new Error(`${description}需要 JSON 对象`);
+  if (!object(parsed)) throw new Error(`${description} must be a JSON object`);
   return parsed;
 }
 
@@ -145,31 +145,31 @@ export function planCapcutProjectImport(
       warnings,
     };
   }
-  const project = readSidecar(manifest, "剪映时间线清单");
+  const project = readSidecar(manifest, "CapCut timeline manifest");
   if (!Array.isArray(project.timelines))
-    throw new Error("剪映项目缺少 timelines 时间线清单");
+    throw new Error("CapCut project is missing its timelines manifest");
   if (project.timelines.length > CAPCUT_MAX_TIMELINES)
-    throw new Error("剪映时间线数量超过导入限制");
+    throw new Error("CapCut project exceeds the timeline import limit");
   if (project.version !== 0)
-    warnings.push("时间线清单版本尚未验证，导入前请核对所选时间线。");
+    warnings.push("This timeline manifest version has not been verified. Review the selected timeline before importing.");
 
   const seen = new Set<string>();
   const entries: { id: string; name: string }[] = [];
   for (const entry of project.timelines) {
-    if (!object(entry)) throw new Error("剪映时间线条目不是对象");
+    if (!object(entry)) throw new Error("CapCut timeline entry must be an object");
     const id = timelineId(entry.id);
-    if (seen.has(id.toLowerCase())) throw new Error("剪映时间线 ID 重复");
+    if (seen.has(id.toLowerCase())) throw new Error("Duplicate CapCut timeline ID");
     seen.add(id.toLowerCase());
     if (typeof entry.is_marked_delete !== "boolean")
-      throw new Error("剪映时间线缺少明确的删除状态");
+      throw new Error("CapCut timeline is missing an explicit deleted status");
     if (entry.is_marked_delete) continue;
     if (entry.name !== undefined && typeof entry.name !== "string")
-      throw new Error("剪映时间线名称无效");
+      throw new Error("Invalid CapCut timeline name");
     if (typeof entry.name === "string" && entry.name.length > 512)
-      throw new Error("剪映时间线名称过长");
+      throw new Error("CapCut timeline name is too long");
     entries.push({ id, name: (entry.name as string | undefined) || id });
   }
-  if (!entries.length) throw new Error("剪映项目没有可导入的未删除时间线");
+  if (!entries.length) throw new Error("CapCut project has no undeleted timelines to import");
 
   const mainId =
     project.main_timeline_id === undefined
@@ -177,20 +177,20 @@ export function planCapcutProjectImport(
       : timelineId(project.main_timeline_id);
   const mainTimelineId = entries.find((entry) => entry.id === mainId)?.id;
   if (mainId && !mainTimelineId)
-    warnings.push("主时间线已删除或不在清单中，请手动选择时间线。");
+    warnings.push("The main timeline was deleted or is missing from the manifest. Select a timeline manually.");
   let activeTimelineId: string | undefined;
   if (layout !== undefined) {
     try {
-      const data = readSidecar(layout, "剪映时间线布局");
+      const data = readSidecar(layout, "CapCut timeline layout");
       const activeId =
         data.activeTimeline === undefined
           ? undefined
           : timelineId(data.activeTimeline);
       activeTimelineId = entries.find((entry) => entry.id === activeId)?.id;
       if (activeId && !activeTimelineId)
-        warnings.push("活动时间线已删除或不在清单中，请手动选择时间线。");
+        warnings.push("The active timeline was deleted or is missing from the manifest. Select a timeline manually.");
     } catch {
-      warnings.push("时间线布局无法验证，已忽略活动时间线提示。");
+      warnings.push("Could not verify the timeline layout. Ignored the active timeline hint.");
     }
   }
   const selectedTimelineId = selection.selectedTimelineId;
@@ -198,7 +198,7 @@ export function planCapcutProjectImport(
     selectedTimelineId &&
     !entries.some((entry) => entry.id === selectedTimelineId)
   )
-    throw new Error("所选时间线已删除或不在项目清单中");
+    throw new Error("The selected timeline was deleted or is missing from the project manifest");
   const paths = pathApi(selection.projectDirectory);
   return {
     selection,
@@ -232,11 +232,11 @@ export function selectCapcutTimelineDraft(
   if (plan.kind === "single-draft") return plan.selection.directDraftPath;
   const selected = chosenTimelineId ?? plan.selectedTimelineId;
   if (selected === undefined && plan.requiresTimelineChoice)
-    throw new Error("该剪映项目有多条时间线，请明确选择要导入的时间线");
+    throw new Error("This CapCut project has multiple timelines. Choose which one to import.");
   const choice =
     selected === undefined
       ? plan.timelines[0]
       : plan.timelines.find((timeline) => timeline.id === timelineId(selected));
-  if (!choice) throw new Error("所选时间线不在可导入清单中");
+  if (!choice) throw new Error("The selected timeline is not available for import");
   return choice.draftPath;
 }

@@ -1,0 +1,79 @@
+name: Release verified Windows build
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful Build and test run on main
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      VALIDATED_RUN: ${{ inputs.run_id }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate exact source and download verified artifacts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if ($env:VALIDATED_RUN -notmatch '^\d+$') { throw 'Invalid run ID' }
+          $run = gh api "repos/$env:GITHUB_REPOSITORY/actions/runs/$env:VALIDATED_RUN" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if ($run.status -ne 'completed' -or $run.conclusion -ne 'success' -or $run.head_branch -ne 'main' -or
+              $run.head_repository.full_name -ne $env:GITHUB_REPOSITORY -or $run.path -ne '.github/workflows/ci.yml') {
+            throw 'Release requires a successful main-branch Build and test run from this repository'
+          }
+          $source = gh api "repos/$env:GITHUB_REPOSITORY/contents/package.json?ref=$($run.head_sha)" | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $package = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($source.content)) | ConvertFrom-Json
+          if ($package.version -notmatch '^\d+\.\d+\.\d+$') { throw 'Release version must be stable semver' }
+          "RELEASE_TAG=v$($package.version)" | Add-Content $env:GITHUB_ENV
+          "RELEASE_SHA=$($run.head_sha)" | Add-Content $env:GITHUB_ENV
+          gh run download $env:VALIDATED_RUN --repo $env:GITHUB_REPOSITORY --name ReaCut-Windows-x64 --dir artifacts
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          gh run download $env:VALIDATED_RUN --repo $env:GITHUB_REPOSITORY --name Windows-packaged-app-evidence --dir evidence
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $build = Get-Content artifacts/BUILD.json -Raw | ConvertFrom-Json
+          if ($build.sourceSha -ne $run.head_sha -or "$($build.runId)" -ne $env:VALIDATED_RUN) { throw 'Artifact provenance mismatch' }
+          foreach ($line in Get-Content artifacts/SHA256SUMS.txt) {
+            $parts = $line -split '  ', 2
+            if ($parts.Count -ne 2 -or [IO.Path]::GetFileName($parts[1]) -ne $parts[1]) { throw 'Invalid checksum entry' }
+            $actual = (Get-FileHash -LiteralPath (Join-Path artifacts $parts[1]) -Algorithm SHA256).Hash
+            if ($actual -ne $parts[0]) { throw "Checksum mismatch: $($parts[1])" }
+          }
+          Copy-Item evidence/english-window/before-window.png artifacts/before.png
+          Copy-Item evidence/english-window/after-window.png artifacts/after.png
+          Copy-Item evidence/english-window/evidence.json artifacts/UI-VERIFICATION.json
+          Copy-Item evidence/package-electron/evidence.json artifacts/EXPORT-VERIFICATION.json
+      - name: Publish installer, ZIP, checksums and visual evidence
+        shell: pwsh
+        run: |
+          @"
+          English throughout the editor, native dialogs, presets, errors, and optional assistant. Existing project text stays unchanged.
+
+          The custom title bar uses native Windows caption controls; macOS keeps left-side traffic lights and Linux uses the native overlay. This release's packaged verification covers Windows x64.
+
+          | Before | After |
+          |---|---|
+          | ![Before](https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG/before.png) | ![After](https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG/after.png) |
+
+          Verified source: $env:RELEASE_SHA. Build and tests: https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:VALIDATED_RUN
+
+          Packaged checks cover English product flows, 1060/1280/1500px title-bar layouts, native window states, preserved user text, and a real 1280x720 MP4 export with audio. Verification JSON and SHA-256 checksums are attached.
+
+          Windows builds are unsigned. Install FFmpeg and FFprobe separately or select their paths in Settings. This remains an experimental editor; macOS/Linux packages and Windows 11 Snap flyouts have not been manually verified.
+          "@ | Set-Content release-notes.md -Encoding utf8
+          $files = Get-ChildItem artifacts -File | ForEach-Object FullName
+          gh release create $env:RELEASE_TAG @files --repo $env:GITHUB_REPOSITORY --target $env:RELEASE_SHA --title "ReaCut $env:RELEASE_TAG - English for Windows" --notes-file release-notes.md
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

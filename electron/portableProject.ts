@@ -10,23 +10,23 @@ export interface PortableDocument { format: "reacut-portable"; version: 1; proje
 const savedCopies = new Map<string, { size: number; mtime: number; relative: string }>();
 const tasks = new Map<string, { controller: AbortController; done: Promise<void> }>();
 const inside = (root: string, file: string) => { const relative = path.relative(root, file); return relative !== "" && !relative.startsWith(`..${path.sep}`) && relative !== ".." && !path.isAbsolute(relative); };
-const abort = (signal: AbortSignal) => { if (signal.aborted) throw new Error("已取消项目打包"); };
+const abort = (signal: AbortSignal) => { if (signal.aborted) throw new Error("Project packaging was canceled"); };
 
 /** Resolve only the format we write; ordinary .reacut projects remain unchanged. */
 export async function resolvePortableDocument(input: unknown, projectFile: string): Promise<Project> {
   if (!input || typeof input !== "object" || (input as any).format !== "reacut-portable") return validateProject(input);
   const document = input as PortableDocument;
-  if (document.version !== 1) throw new Error("不支持的素材包版本");
+  if (document.version !== 1) throw new Error("Unsupported media package version");
   const project = validateProject(document.project);
   const directory = await realpath(path.dirname(projectFile));
   const mediaDirectory = await realpath(path.join(directory, "media"));
-  if (!inside(directory, mediaDirectory)) throw new Error("素材包目录指向包外位置");
+  if (!inside(directory, mediaDirectory)) throw new Error("Package directory points outside the package");
   for (const asset of project.assets) {
-    if (!/^media\/[a-f\d-]{36}\.[a-z\d]{1,12}$/i.test(asset.path)) throw new Error("素材包包含无效的相对路径");
+    if (!/^media\/[a-f\d-]{36}\.[a-z\d]{1,12}$/i.test(asset.path)) throw new Error("Package contains an invalid relative path");
     const candidate = path.resolve(directory, ...asset.path.split("/"));
     let resolved = candidate;
     try { resolved = await realpath(candidate); } catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
-    if (!inside(mediaDirectory, resolved)) throw new Error("素材包引用了包外文件");
+    if (!inside(mediaDirectory, resolved)) throw new Error("Package references a file outside the package");
     asset.path = resolved; asset.url = `file://${resolved}`;
     delete asset.thumbnail; delete asset.previewUrl; delete asset.previewError; delete asset.waveform;
   }
@@ -35,17 +35,17 @@ export async function resolvePortableDocument(input: unknown, projectFile: strin
 
 export async function collectPortableProject(input: Project, parent: string, signal: AbortSignal, progress: (fraction: number, message: string) => void): Promise<string> {
   const project = validateProject(input);
-  if (!path.isAbsolute(parent) || !(await stat(parent)).isDirectory()) throw new Error("请选择有效的目标文件夹");
+  if (!path.isAbsolute(parent) || !(await stat(parent)).isDirectory()) throw new Error("Choose a valid destination folder");
   const unique = new Map<string, { source: string; destination: string; bytes: number; mtime: number; ids: string[] }>();
   const assetPaths = new Map<string, string>();
   let total = 0;
   for (const asset of project.assets) {
     abort(signal);
-    if (!path.isAbsolute(asset.path)) throw new Error(`素材“${asset.name}”不是本地文件`);
+    if (!path.isAbsolute(asset.path)) throw new Error(`Media “${asset.name}” is not a local file`);
     let resolved: string;
-    try { resolved = await realpath(asset.path); } catch { throw new Error(`找不到素材“${asset.name}”，请重新链接后打包`); }
+    try { resolved = await realpath(asset.path); } catch { throw new Error(`Media “${asset.name}” was not found. Relink it before packaging.`); }
     const metadata = await stat(resolved);
-    if (!metadata.isFile()) throw new Error(`素材“${asset.name}”不是普通文件`);
+    if (!metadata.isFile()) throw new Error(`Media “${asset.name}” is not a regular file`);
     if (!unique.has(resolved)) {
       const extension = path.extname(resolved).slice(1).toLowerCase();
       const destination = `media/${randomUUID()}.${/^[a-z\d]{1,12}$/.test(extension) ? extension : "bin"}`;
@@ -65,23 +65,23 @@ export async function collectPortableProject(input: Project, parent: string, sig
       let copied = 0;
       source.on("data", chunk => {
         hash.update(chunk); copied += chunk.length;
-        if (Date.now() - lastUpdate > 100) { lastUpdate = Date.now(); progress(total ? Math.min(.98, (completedBytes + copied) / total * .98) : 0, `正在收集素材 ${count + 1} / ${unique.size}`); }
+        if (Date.now() - lastUpdate > 100) { lastUpdate = Date.now(); progress(total ? Math.min(.98, (completedBytes + copied) / total * .98) : 0, `Collecting media ${count + 1} / ${unique.size}`); }
       });
       await pipeline(source, createWriteStream(path.join(temporary, entry.destination), { flags: "wx", mode: 0o600 }), { signal });
       const after = await stat(entry.source);
-      if (after.size !== entry.bytes || after.mtimeMs !== entry.mtime || copied !== entry.bytes) throw new Error("素材在打包期间发生变化，请完成修改后重试");
+      if (after.size !== entry.bytes || after.mtimeMs !== entry.mtime || copied !== entry.bytes) throw new Error("Media changed during packaging. Finish editing and try again.");
       completedBytes += copied; count++;
       manifest.push({ file: entry.destination, bytes: copied, sha256: hash.digest("hex"), assetIds: entry.ids });
     }
     abort(signal);
     project.assets = project.assets.map(asset => ({ id: asset.id, name: asset.name, kind: asset.kind, path: assetPaths.get(asset.id)!, url: assetPaths.get(asset.id)!, duration: asset.duration, width: asset.width, height: asset.height, fps: asset.fps, hasAudio: asset.hasAudio }));
     const document: PortableDocument = { format: "reacut-portable", version: 1, project };
-    await writeFile(path.join(temporary, "项目.reacut"), JSON.stringify(document, null, 2), { mode: 0o600 });
+    await writeFile(path.join(temporary, "project.reacut"), JSON.stringify(document, null, 2), { mode: 0o600 });
     await writeFile(path.join(temporary, "manifest.json"), JSON.stringify({ format: "reacut-media-manifest", version: 1, files: manifest }, null, 2), { mode: 0o600 });
-    await writeFile(path.join(temporary, "使用说明.txt"), "请移动整个文件夹，保留 media 子目录。用 ReaCut 打开 项目.reacut 即可继续编辑。\n这是工程与原始素材的副本，不会改变原项目。字体仍以目标电脑及应用内置字体为准。\nmanifest.json 记录首次收集时的文件校验值；后续编辑保存不会更新这份历史清单。\n");
+    await writeFile(path.join(temporary, "README.txt"), "Move the entire folder and keep the media subfolder. Open project.reacut in ReaCut to continue editing.\nThis is a copy of the project and source media; the original project is unchanged. Fonts depend on the target computer and the fonts included with the app.\nmanifest.json records file checksums from the initial collection. Later edits do not update this historical manifest.\n");
     abort(signal);
-    const name = project.name.replace(/[<>:"/\\|?*\x00-\x1f]/g, "_").slice(0, 60).replace(/[. ]+$/, "") || "ReaCut项目";
-    const destination = path.join(parent, `${name}-素材包-${randomUUID().slice(0, 8)}`);
+    const name = project.name.replace(/[<>:"/\\|?*\x00-\x1f]/g, "_").slice(0, 60).replace(/[. ]+$/, "") || "ReaCut Project";
+    const destination = path.join(parent, `${name}-media-package-${randomUUID().slice(0, 8)}`);
     await rename(temporary, destination);
     return destination;
   } catch (error) { await rm(temporary, { recursive: true, force: true }); throw error; }
@@ -91,7 +91,7 @@ export function startPortablePackage(project: Project, parent: string, callback:
   const jobId = randomUUID(), controller = new AbortController();
   const emit = (event: Omit<ExportProgress, "jobId">) => { try { callback({ jobId, ...event }); } catch { /* Window may have closed. */ } };
   const done = Promise.resolve().then(async () => {
-    emit({ status: "preparing", progress: 0, message: "正在检查素材" });
+    emit({ status: "preparing", progress: 0, message: "Checking media" });
     try {
       const destination = await collectPortableProject(project, parent, controller.signal, (fraction, message) => emit({ status: "rendering", progress: fraction, message }));
       emit({ status: "complete", progress: 1, path: destination });
@@ -108,7 +108,7 @@ export async function cancelPortablePackages(): Promise<void> { const current = 
 export async function savePortableDocument(input: Project, file: string): Promise<void> {
   const project = validateProject(input), directory = await realpath(path.dirname(file));
   const media = await realpath(path.join(directory, "media"));
-  if (!inside(directory, media)) throw new Error("素材包目录指向包外位置");
+  if (!inside(directory, media)) throw new Error("Package directory points outside the package");
   const copied: string[] = [], destinations = new Map<string, string>();
   const pendingCache = new Map<string, { size: number; mtime: number; relative: string }>();
   const temporaryFile = `${file}.${randomUUID()}.tmp`;
@@ -130,12 +130,12 @@ export async function savePortableDocument(input: Project, file: string): Promis
           const target = path.join(directory, cached.relative);
           try { if (await realpath(target) === target && (await stat(target)).size === cached.size) relative = cached.relative; } catch { /* A missing copy cannot recover the source. */ }
         }
-        if (!relative) throw new Error(`找不到素材“${asset.name}”，请重新链接后保存`);
+        if (!relative) throw new Error(`Media “${asset.name}” was not found. Relink it before saving.`);
         asset.path = relative; asset.url = relative;
         delete asset.thumbnail; delete asset.previewUrl; delete asset.previewError; delete asset.waveform; delete asset.missing;
         continue;
       }
-      if (!metadata.isFile()) throw new Error(`素材“${asset.name}”不是普通文件`);
+      if (!metadata.isFile()) throw new Error(`Media “${asset.name}” is not a regular file`);
       let relative = destinations.get(source);
       if (!relative && path.dirname(source) === media && /^[a-f\d-]{36}\.[a-z\d]{1,12}$/i.test(path.basename(source))) relative = `media/${path.basename(source)}`;
       if (!relative && cached && cached.size === metadata.size && cached.mtime === metadata.mtimeMs) {
@@ -148,7 +148,7 @@ export async function savePortableDocument(input: Project, file: string): Promis
         const target = path.join(directory, relative); copied.push(target);
         await pipeline(createReadStream(source), createWriteStream(target, { flags: "wx", mode: 0o600 }));
         const after = await stat(source);
-        if (after.size !== metadata.size || after.mtimeMs !== metadata.mtimeMs) throw new Error("素材在保存期间发生变化，请重试");
+        if (after.size !== metadata.size || after.mtimeMs !== metadata.mtimeMs) throw new Error("Media changed while saving. Try again.");
       }
       destinations.set(source, relative);
       pendingCache.set(cacheKey, { size: metadata.size, mtime: metadata.mtimeMs, relative });

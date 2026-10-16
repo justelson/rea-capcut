@@ -1,5 +1,6 @@
 import { App } from '@modelcontextprotocol/ext-apps';
-const app = new App({ name: 'ReaCut', version: '0.5.0' }, { availableDisplayModes: ['fullscreen'] }, { autoResize: false });
+import packageJson from '../../package.json';
+const app = new App({ name: 'ReaCut', version: packageJson.version }, { availableDisplayModes: ['fullscreen'] }, { autoResize: false });
 const screen = document.querySelector<HTMLImageElement>('#screen')!;
 const status = document.querySelector<HTMLElement>('#status')!;
 const stage = document.querySelector<HTMLElement>('#stage')!;
@@ -8,7 +9,7 @@ let stopped = false, connected = false, dragging = false, lastMove = 0;
 let queue = Promise.resolve();
 async function call(name: string, args: Record<string, unknown> = {}) {
   const result = await app.callServerTool({ name, arguments: args });
-  if (result.isError) throw new Error(result.content?.filter(c => c.type === 'text').map(c => c.text).join(' ') || '操作失败');
+  if (result.isError) throw new Error(result.content?.filter(c => c.type === 'text').map(c => c.text).join(' ') || 'Operation failed.');
   return result.structuredContent as Record<string, any>;
 }
 function input(args: Record<string, unknown>) {
@@ -21,8 +22,8 @@ async function poll() {
     try {
       const frame = await call('reacut_frame');
       if (frame.data) { screen.src = `data:image/jpeg;base64,${frame.data}`; screen.width = frame.width; screen.height = frame.height; }
-      status.textContent = '本地连接 · 实时画面';
-    } catch (e) { status.textContent = `连接中断 · ${e instanceof Error ? e.message : e}`; }
+      status.textContent = 'Connected locally · Live preview';
+    } catch (e) { status.textContent = `Connection lost · ${e instanceof Error ? e.message : e}`; }
   }
   if (!stopped) setTimeout(poll, 150);
 }
@@ -75,7 +76,7 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-menu]')
 document.querySelector<HTMLButtonElement>('#desktop')!.onclick = () => { if (connected) void input({ type: 'desktop' }); };
 document.querySelector<HTMLButtonElement>('#zoom')!.onclick = e => {
   const original = stage.classList.toggle('original');
-  (e.currentTarget as HTMLButtonElement).textContent = original ? '适应窗口' : '100%';
+  (e.currentTarget as HTMLButtonElement).textContent = original ? 'Fit to window' : '100%';
 };
 app.onteardown = async () => { stopped = true; return {}; };
 app.ontoolresult = () => {};
@@ -83,4 +84,4 @@ void app.connect().then(async () => {
   connected = true;
   try { await app.requestDisplayMode({ mode: 'fullscreen' }); } catch { /* host chooses presentation */ }
   void poll();
-}).catch(e => { status.textContent = `无法连接 Codex：${e.message}`; });
+}).catch(e => { status.textContent = `Could not connect to Codex: ${e.message}`; });

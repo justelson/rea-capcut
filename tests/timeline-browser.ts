@@ -197,9 +197,9 @@ try {
     "keyboard cannot move locked clips",
   );
   await page.getByRole("button", { name: "解锁画面 2", exact: true }).click();
-  await page.getByRole("tab", { name: "淡入淡出", exact: true }).click();
+  await page.getByRole("tab", { name: "Fade in / out", exact: true }).click();
   await page
-    .getByRole("button", { name: "淡入淡出", exact: true })
+    .getByRole("button", { name: "Fade in / out", exact: true })
     .first()
     .click();
   p = await read();
@@ -247,7 +247,7 @@ try {
   const beforeZoom = await page.evaluate(
     () => (window as any).qa.store.getState().zoom,
   );
-  await page.getByRole("button", { name: "缩小时间线", exact: true }).click();
+  await page.getByRole("button", { name: "Zoom out timeline", exact: true }).click();
   assert(
     (await page.evaluate(() => (window as any).qa.store.getState().zoom)) <
       beforeZoom,
@@ -263,8 +263,8 @@ try {
       wheelBefore,
     "control-wheel must zoom the timeline",
   );
-  await page.getByRole("button", { name: "添加轨道", exact: true }).click();
-  await page.getByRole("button", { name: "文字轨道", exact: true }).click();
+  await page.getByRole("button", { name: "Add track", exact: true }).click();
+  await page.getByRole("button", { name: "Text track", exact: true }).click();
   assert.equal(
     (await read()).tracks.filter((t: any) => t.kind === "text").length,
     1,
@@ -272,12 +272,12 @@ try {
   p = await read();
   const audioId = p.tracks.find((t: any) => t.kind === "audio").id;
   await page.getByRole("button", { name: "音乐轨道操作", exact: true }).click();
-  await page.getByRole("menuitem", { name: "重命名轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Rename track", exact: true }).click();
   await page
-    .getByRole("textbox", { name: "轨道名称", exact: true })
+    .getByRole("textbox", { name: "Track name", exact: true })
     .fill("背景音乐");
   await page
-    .getByRole("textbox", { name: "轨道名称", exact: true })
+    .getByRole("textbox", { name: "Track name", exact: true })
     .press("Enter");
   assert.equal(
     (await read()).tracks.find((t: any) => t.id === audioId).name,
@@ -286,12 +286,12 @@ try {
   await page
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
-  await page.getByRole("menuitem", { name: "重命名轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Rename track", exact: true }).click();
   await page
-    .getByRole("textbox", { name: "轨道名称", exact: true })
+    .getByRole("textbox", { name: "Track name", exact: true })
     .fill("不要保存");
   await page
-    .getByRole("textbox", { name: "轨道名称", exact: true })
+    .getByRole("textbox", { name: "Track name", exact: true })
     .press("Escape");
   assert.equal(
     (await read()).tracks.find((t: any) => t.id === audioId).name,
@@ -302,7 +302,7 @@ try {
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
   await page
-    .getByRole("menuitem", { name: "向上移动轨道", exact: true })
+    .getByRole("menuitem", { name: "Move track up", exact: true })
     .click();
   assert.equal(
     (await read()).tracks.findIndex((t: any) => t.id === audioId),
@@ -312,7 +312,7 @@ try {
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
   await page
-    .getByRole("menuitem", { name: "向下移动轨道", exact: true })
+    .getByRole("menuitem", { name: "Move track down", exact: true })
     .click();
   assert.deepEqual(
     (await read()).tracks.map((t: any) => t.id),
@@ -330,24 +330,24 @@ try {
   await page
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
-  await page.getByRole("menuitem", { name: "删除轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await expect(
-    page.getByRole("dialog", { name: "删除轨道确认", exact: true }),
+    page.getByRole("dialog", { name: "Confirm track deletion", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "取消", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   assert((await read()).tracks.some((t: any) => t.id === audioId));
   await page
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
-  await page.getByRole("menuitem", { name: "删除轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await page
-    .getByRole("button", { name: "删除轨道和片段", exact: true })
+    .getByRole("button", { name: "Delete track and clips", exact: true })
     .click();
   p = await read();
   assert(!p.tracks.some((t: any) => t.id === audioId));
   assert(!p.clips.some((c: any) => c.id === "music"));
   assert.equal(p.assets.length, 2);
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   p = await read();
   assert(p.tracks.some((t: any) => t.id === audioId));
   assert(p.clips.some((c: any) => c.id === "music"));
@@ -355,16 +355,16 @@ try {
   await page
     .getByRole("button", { name: "文字 1轨道操作", exact: true })
     .click();
-  await page.getByRole("menuitem", { name: "删除轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   assert(!(await read()).tracks.some((t: any) => t.id === emptyId));
   await expect(
-    page.getByRole("dialog", { name: "删除轨道确认", exact: true }),
+    page.getByRole("dialog", { name: "Confirm track deletion", exact: true }),
   ).toHaveCount(0);
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   // Create enough rows to exercise the sticky ruler independently of the content scroll.
   for (let i = 0; i < 5; i++) {
-    await page.getByRole("button", { name: "添加轨道", exact: true }).click();
-    await page.getByRole("button", { name: "视频轨道", exact: true }).click();
+    await page.getByRole("button", { name: "Add track", exact: true }).click();
+    await page.getByRole("button", { name: "Video track", exact: true }).click();
   }
   await page.locator(".tl-scroll").evaluate((el) => {
     el.scrollTop = 200;
@@ -379,12 +379,12 @@ try {
     "playhead handle must remain in the sticky ruler after vertical scrolling",
   );
   for (let i = 0; i < 5; i++)
-    await page.getByRole("button", { name: "撤销", exact: true }).click();
+    await page.getByRole("button", { name: "Undo", exact: true }).click();
   await page.locator(".tl-scroll").evaluate((el) => {
     el.scrollTop = 0;
   });
   await expect(
-    page.getByRole("button", { name: "磁性删除", exact: true }),
+    page.getByRole("button", { name: "Ripple delete", exact: true }),
   ).toBeVisible();
   assert.deepEqual(errors, []);
   mkdirSync("docs/screenshots", { recursive: true });

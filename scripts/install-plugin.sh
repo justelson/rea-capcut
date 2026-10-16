@@ -19,4 +19,4 @@ fi
 python3 "$task_root/plugin/scripts/launch.py" --check
 codex plugin marketplace add "$task_root" --json
 codex plugin add reacut@reacut-local --json
-printf '%s\n' 'ReaCut plugin installed. Reconnect or open a new Codex chat, then ask: 用 ReaCut 在右侧打开视频编辑器。'
+printf '%s\n' 'ReaCut plugin installed. Reconnect or open a new Codex chat, then ask: Open the ReaCut editor in the side panel.'

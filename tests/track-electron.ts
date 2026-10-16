@@ -69,8 +69,8 @@ try {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.waitForSelector(".app-shell");
   const initialGeometry = await verifyEditorViewport(page);
-  await page.getByRole("button", { name: "文件菜单", exact: true }).click();
-  await page.getByRole("button", { name: "打开项目", exact: false }).click();
+  await page.getByRole("button", { name: "File menu", exact: true }).click();
+  await page.getByRole("button", { name: "Open project", exact: false }).click();
   await expect(page.locator(".tl-clip")).toHaveCount(3);
   let firstSave = true;
   const save = async (): Promise<Project> => {
@@ -79,10 +79,10 @@ try {
       .catch(() => -1);
     if (firstSave) {
       firstSave = false;
-      await page!.getByRole("button", { name: "文件菜单", exact: true }).click();
-      await page!.getByRole("button", { name: "另存为", exact: false }).click();
+      await page!.getByRole("button", { name: "File menu", exact: true }).click();
+      await page!.getByRole("button", { name: "Save as…", exact: false }).click();
     } else {
-      await page!.getByRole("button", { name: "保存项目", exact: true }).click();
+      await page!.getByRole("button", { name: "Save project", exact: true }).click();
     }
     await expect
       .poll(() =>
@@ -111,12 +111,12 @@ try {
     project.tracks[1].id,
   );
   await page.getByRole("button", { name: "音乐轨道操作", exact: true }).click();
-  await page.getByRole("menuitem", { name: "重命名轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Rename track", exact: true }).click();
   await page
-    .getByRole("textbox", { name: "轨道名称", exact: true })
+    .getByRole("textbox", { name: "Track name", exact: true })
     .fill("背景音乐");
   await page
-    .getByRole("textbox", { name: "轨道名称", exact: true })
+    .getByRole("textbox", { name: "Track name", exact: true })
     .press("Enter");
   edited = await save();
   assert.equal(edited.tracks[2].name, "背景音乐");
@@ -124,7 +124,7 @@ try {
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
   await page
-    .getByRole("menuitem", { name: "向上移动轨道", exact: true })
+    .getByRole("menuitem", { name: "Move track up", exact: true })
     .click();
   edited = await save();
   assert.equal(edited.tracks[1].id, project.tracks[2].id);
@@ -132,7 +132,7 @@ try {
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
   await page
-    .getByRole("menuitem", { name: "向下移动轨道", exact: true })
+    .getByRole("menuitem", { name: "Move track down", exact: true })
     .click();
   edited = await save();
   assert.deepEqual(
@@ -153,18 +153,18 @@ try {
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
   await expect(
-    page.getByRole("menuitem", { name: "向上移动轨道", exact: true }),
+    page.getByRole("menuitem", { name: "Move track up", exact: true }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "解锁叠加画面", exact: true }).click();
   await page
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
-  await page.getByRole("menuitem", { name: "删除轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await expect(
-    page.getByRole("dialog", { name: "删除轨道确认", exact: true }),
+    page.getByRole("dialog", { name: "Confirm track deletion", exact: true }),
   ).toBeVisible();
   await page.keyboard.press("Backspace");
-  await page.getByRole("button", { name: "取消", exact: true }).click();
+  await page.getByRole("button", { name: "Cancel", exact: true }).click();
   edited = await save();
   assert.equal(
     edited.clips.length,
@@ -174,22 +174,22 @@ try {
   await page
     .getByRole("button", { name: "背景音乐轨道操作", exact: true })
     .click();
-  await page.getByRole("menuitem", { name: "删除轨道", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await page
-    .getByRole("button", { name: "删除轨道和片段", exact: true })
+    .getByRole("button", { name: "Delete track and clips", exact: true })
     .click();
   edited = await save();
   assert.equal(edited.tracks.length, 2);
   assert.equal(edited.clips.length, 2);
   assert.equal(edited.assets.length, 2);
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   edited = await save();
   assert.equal(edited.tracks.length, 3);
   assert.equal(edited.clips.length, 3);
   assert.equal(edited.tracks[2].name, "背景音乐");
   for (let i = 0; i < 4; i++) {
-    await page.getByRole("button", { name: "添加轨道", exact: true }).click();
-    await page.getByRole("button", { name: "视频轨道", exact: true }).click();
+    await page.getByRole("button", { name: "Add track", exact: true }).click();
+    await page.getByRole("button", { name: "Video track", exact: true }).click();
   }
   await page.locator(".tl-scroll").evaluate((el) => {
     el.scrollTop = 140;
@@ -198,7 +198,7 @@ try {
   await expect
     .poll(async () => {
       const handle = (await page!
-        .getByRole("slider", { name: "播放位置", exact: true })
+        .getByRole("slider", { name: "Playhead position", exact: true })
         .boundingBox())!;
       return handle.y >= scrollBox.y && handle.y < scrollBox.y + 30;
     })

@@ -87,7 +87,7 @@ try {
     })
     .toBe(true);
   await page.mouse.up();
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect(page.locator(".save-dot")).not.toHaveClass(/dirty/);
   let savedProject: Project = JSON.parse(await readFile(saved, "utf8"));
   const moved = savedProject.clips[0],
@@ -97,14 +97,14 @@ try {
     moved.keyframes.every((k) => Math.abs(k.value - delta) < 0.1),
     "Dragging must shift the complete keyframed path",
   );
-  await page.getByRole("button", { name: "撤销", exact: true }).click();
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
   await expect
     .poll(async () => {
       const p = await pixel();
       return p[0] > 180 && p[1] < 70 && p[2] < 70;
     })
     .toBe(true);
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect(page.locator(".save-dot")).not.toHaveClass(/dirty/);
   savedProject = JSON.parse(await readFile(saved, "utf8"));
   assert.equal(savedProject.clips[0].transform.x, 0);
