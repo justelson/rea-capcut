@@ -27,7 +27,7 @@ jobs:
       - name: Type-check and build application
         run: npm run build
       - name: Package unsigned installer and standalone ZIP
-        run: npx electron-builder --win nsis zip --x64 --publish never -c.win.signAndEditExecutable=false
+        run: npx electron-builder --win nsis zip --x64 --publish never
       - name: Install external media tools for package verification
         shell: pwsh
         run: |

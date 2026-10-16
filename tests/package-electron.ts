@@ -16,8 +16,7 @@ const bundle = path.resolve(
 );
 const resources = windows ? path.join(bundle, "resources") : path.join(bundle, "Contents", "Resources");
 const executable = windows ? path.join(bundle, "ReaCut.exe") : path.join(bundle, "Contents", "MacOS", "ReaCut");
-const
-  demo = path.join(root, ".demo", "demo.reacut"),
+const demo = path.join(root, ".demo", "demo.reacut"),
   exported = path.join(output, "packaged-demo.mp4");
 await stat(executable);
 await stat(demo);
