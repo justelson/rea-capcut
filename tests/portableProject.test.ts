@@ -29,7 +29,7 @@ describe('portable project collection',()=>{
   expect(document.project.assets[0].thumbnail).toBeUndefined();expect(document.project.assets[0].previewUrl).toBeUndefined();
   const manifest=JSON.parse(await readFile(path.join(folder,'manifest.json'),'utf8'));
   expect(manifest.files).toHaveLength(1);expect(manifest.files[0].sha256).toBe(createHash('sha256').update(await readFile(source)).digest('hex'));
-  expect(JSON.stringify(project)).toBe(before);expect(original).toContain(source);
+  expect(JSON.stringify(project)).toBe(before);expect(JSON.parse(original).assets[0].path).toBe(source);
   const moved=path.join(root,'移动后的项目');await rename(folder,moved);await rm(source);
   const hydrated=await load(moved);expect(hydrated.assets[0].path.startsWith((await realpath(moved))+path.sep)).toBe(true);
   expect((await readFile(hydrated.assets[0].path)).toString()).toBe('synthetic source bytes');

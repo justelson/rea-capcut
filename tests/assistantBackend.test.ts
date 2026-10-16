@@ -2,14 +2,17 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { chmod, mkdtemp, readFile, readdir, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 import { assistantCommand, assistantReplyPrefix, discoverAssistantProviders, parseAssistantResponse, resolveAssistantExecutable, startAssistantSession, validateAssistantRequest } from "../electron/assistantBackend";
 import type { AssistantEvent, AssistantProvider, AssistantRequest } from "../src/core/assistantTypes";
 
 let folder: string, fixture: string;
 beforeAll(async () => {
   folder = await mkdtemp(path.join(os.tmpdir(), "reacut-assistant-tests-"));
-  fixture = path.join(folder, "cli fixture");
-  await writeFile(fixture, `#!${process.execPath}
+  fixture = path.join(folder, process.platform === "win32" ? "cli fixture.exe" : "cli fixture");
+  const source = process.platform === "win32" ? path.join(folder, "cli-fixture.cjs") : fixture;
+  await writeFile(source, `#!${process.execPath}
 const fs = require('node:fs');
 const args = process.argv.slice(2);
 if(args.includes('--version')) { console.log('fixture 1.0'); process.exit(0); }
@@ -36,8 +39,16 @@ let prompt='';process.stdin.setEncoding('utf8');process.stdin.on('data',d=>promp
   }
 });
 `);
-  await chmod(fixture, 0o755);
-});
+  if (process.platform === "win32") {
+    // Windows CreateProcess cannot run a shebang script. Build the same fixture
+    // as a native Node SEA, preserving the production no-shell/.exe boundary.
+    const config = path.join(folder, "sea-config.json");
+    await writeFile(config, JSON.stringify({ main: source, output: fixture, disableExperimentalSEAWarning: true }));
+    await promisify(execFile)(process.execPath, ["--build-sea", config], { timeout: 60_000 });
+  } else {
+    await chmod(fixture, 0o755);
+  }
+}, 60_000);
 afterAll(() => rm(folder, { recursive: true, force: true }));
 const request = (provider: AssistantProvider = "codex", prompt = "加标题 $(touch nope); `echo no`中文"): AssistantRequest => ({
   requestId: "request-1", provider, prompt, history: [{ role: "user", content: "先建议标题" }],

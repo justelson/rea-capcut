@@ -14,6 +14,8 @@ beforeAll(async () => {
     for (const tool of ["ffmpeg", "ffprobe"]) {
       await writeFile(path.join(folder, tool), "#!/bin/sh\nexit 0\n");
       await chmod(path.join(folder, tool), 0o755);
+      if (process.platform === "win32")
+        await writeFile(path.join(folder, `${tool}.exe`), "resolver fixture; not executed");
     }
   }
 });
@@ -36,5 +38,6 @@ it("does not hide a stale explicit override with the bundled tool", async () => 
     .rejects.toThrow("所选 ffmpeg");
 });
 it("retains PATH discovery for source development", async () => {
-  expect(await resolveMediaTool("ffmpeg", { platform: "darwin", env: { PATH: system } })).toBe(path.join(system, "ffmpeg"));
+  const executable = process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg";
+  expect(await resolveMediaTool("ffmpeg", { env: { PATH: system } })).toBe(path.join(system, executable));
 });

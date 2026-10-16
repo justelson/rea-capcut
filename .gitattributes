@@ -1,2 +1,5 @@
 # Third-party license copies belong in distributions, not source-language stats.
 licenses/** linguist-vendored
+
+# Font provenance verifies the original license bytes on every platform.
+public/fonts/OFL.txt -text
