@@ -18,7 +18,7 @@ const fs=require('node:fs');const args=process.argv.slice(2);
 if(args.includes('--version')){console.log('ReaCut synthetic fixture 1.0');process.exit(0)}
 if(args.includes('--help')){console.log('--ignore-user-config --ephemeral --output-schema --sandbox --tools --strict-mcp-config --setting-sources --no-session-persistence --json-schema');process.exit(0)}
 let prompt='';process.stdin.setEncoding('utf8');process.stdin.on('data',d=>prompt+=d);process.stdin.on('end',()=>{
-const current=prompt.split('本次用户请求：').at(-1);fs.appendFileSync(${JSON.stringify(invocations)},JSON.stringify({args,cwd:process.cwd(),prompt,current,pid:process.pid})+'\\n');
+const current=prompt.split('Current user request:\n').at(-1);fs.appendFileSync(${JSON.stringify(invocations)},JSON.stringify({args,cwd:process.cwd(),prompt,current,pid:process.pid})+'\\n');
 const event=value=>process.stdout.write(JSON.stringify(value)+'\\n');
 if(current.includes('CASE_CANCEL')){setInterval(()=>{},1000);return;}
 const response={reply:args[0]==='exec'?'Codex 合成回复：请确认两项修改。':'Claude 合成回复：请确认两项修改。',actions:[{type:'addText',text:'原创片头·你好映刻',start:0,duration:2,fontSize:32,color:'#ffffff',x:null,y:null},{type:'setProject',name:null,width:null,height:null,fps:null,background:'#172b3c'}]};
@@ -37,7 +37,7 @@ const errors: string[] = [], failedMedia: string[] = [], checks: string[] = [];
 try {
  await app.evaluate(({dialog}, args) => {
   (dialog as any).showOpenDialog=async()=>({canceled:false,filePaths:[args.fixture]});
-  (dialog as any).showSaveDialog=async(_window: unknown, options: {title?:string})=>({canceled:false,filePath:options?.title?.includes("导出")?args.exported:args.saved});
+  (dialog as any).showSaveDialog=async(_window: unknown, options: {title?:string})=>({canceled:false,filePath:options?.title?.includes("Export")?args.exported:args.saved});
   (dialog as any).showMessageBox=async()=>({response:2});
  },{fixture,saved,exported});
  page = await app.firstWindow();

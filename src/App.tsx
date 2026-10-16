@@ -389,7 +389,7 @@ function ExportDialog({
               }
             >
               <FolderOpen size={15} />
-              Show in Finder
+              Show in folder
             </button>
             <button className="primary" onClick={onClose}>
               <Check size={15} />
@@ -405,7 +405,7 @@ function ExportDialog({
               disabled={!project.clips.length}
             >
               <Download size={16} />
-              Export
+              Start export
             </button>
           </>
         )}

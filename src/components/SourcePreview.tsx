@@ -155,7 +155,7 @@ function SourcePreviewSession({ asset, fps, onClose, onAddRange }: SourcePreview
         </div>
         <div className="source-controls">
           <span className="timecode"><strong>{formatTime(time,frameRate)}</strong><span> / {formatTime(duration,frameRate)}</span></span>
-          <div className="source-transport"><button aria-label="Previous source frame" disabled={unavailable} onClick={() => seek(time-frame)}><ChevronLeft size={16} /></button><button aria-label={playing ? "PauseMedia" : "PlayMedia"} disabled={unavailable} onClick={() => void playPause()}>{playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}</button><button aria-label="Next source frame" disabled={unavailable} onClick={() => seek(time+frame)}><ChevronRight size={16} /></button></div>
+          <div className="source-transport"><button aria-label="Previous source frame" disabled={unavailable} onClick={() => seek(time-frame)}><ChevronLeft size={16} /></button><button aria-label={playing ? "Pause media" : "Play media"} disabled={unavailable} onClick={() => void playPause()}>{playing ? <Pause size={17} fill="currentColor" /> : <Play size={17} fill="currentColor" />}</button><button aria-label="Next source frame" disabled={unavailable} onClick={() => seek(time+frame)}><ChevronRight size={16} /></button></div>
           <button aria-label={muted ? "Enable source audio" : "Mute source audio"} onClick={() => setMuted(!muted)} disabled={unavailable}>{muted ? <VolumeX size={16} /> : <Volume2 size={16} />}</button>
         </div>
       </>}

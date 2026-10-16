@@ -292,13 +292,13 @@ try {
   // A disabled track must also disable all feature controls.
   const track = project.tracks.find((t) => t.id === project.clips[0].trackId)!;
   await page
-    .getByRole("button", { name: `锁定${track.name}`, exact: true })
+    .getByRole("button", { name: `Lock ${track.name}`, exact: true })
     .click();
   await expect(
     page.getByRole("checkbox", { name: "Enable chroma key", exact: true }),
   ).toBeDisabled();
   await page
-    .getByRole("button", { name: `解锁${track.name}`, exact: true })
+    .getByRole("button", { name: `Unlock ${track.name}`, exact: true })
     .click();
   await page.getByRole("button", { name: "Clear chroma key", exact: true }).click();
   project = await save();

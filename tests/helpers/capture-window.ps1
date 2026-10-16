@@ -13,11 +13,13 @@ public static class ReaCutWindowCapture {
 $handle = [IntPtr]::new($WindowHandle)
 $rect = New-Object ReaCutWindowCapture+Rect
 if (-not [ReaCutWindowCapture]::GetWindowRect($handle, [ref]$rect)) { throw 'Test window not found' }
-$image = New-Object System.Drawing.Bitmap(($rect.Right - $rect.Left), ($rect.Bottom - $rect.Top))
+$image = [System.Drawing.Bitmap]::new(($rect.Right - $rect.Left), ($rect.Bottom - $rect.Top))
 $graphics = [System.Drawing.Graphics]::FromImage($image)
 $target = $graphics.GetHdc()
 try {
-  if (-not [ReaCutWindowCapture]::PrintWindow($handle, $target, 2)) { throw 'Test window capture failed' }
-} finally { $graphics.ReleaseHdc($target) }
-try { $image.Save($Destination, [System.Drawing.Imaging.ImageFormat]::Png) }
+  try {
+    if (-not [ReaCutWindowCapture]::PrintWindow($handle, $target, 2)) { throw 'Test window capture failed' }
+  } finally { $graphics.ReleaseHdc($target) }
+  $image.Save($Destination, [System.Drawing.Imaging.ImageFormat]::Png)
+}
 finally { $graphics.Dispose(); $image.Dispose() }

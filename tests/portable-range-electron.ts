@@ -42,7 +42,7 @@ try {
  assert(!JSON.stringify(packed).includes(originals));checks.push('UI collects portable project; shared references deduplicate; source paths and proxy caches omitted');
  const moved=path.join(output,'搬移后的完整项目');await rename(folder,moved);await rename(originals,path.join(output,'originals-unavailable'));
  await app.evaluate(({dialog},file)=>{(dialog as any).showOpenDialog=async()=>({canceled:false,filePaths:[file]});},path.join(moved,'project.reacut'));
- await page.getByRole('button',{name:'File menu'}).click();await page.getByRole('button',{name:/^打开项目/}).click();
+ await page.getByRole('button',{name:'File menu'}).click();await page.getByRole('button',{name:/^Open project/}).click();
  await expect.poll(()=>page.evaluate(async()=>{const p=await window.editorAPI!.getRecentProjects();return p[0]?.path;}),{timeout:20000}).toBe(path.join(moved,'project.reacut'));
  await expect(page.locator('.tl-clip')).toHaveCount(1);
  await expect.poll(()=>page.evaluate(()=>{const c=document.querySelector<HTMLCanvasElement>('.player-panel canvas')!;return c.getContext('2d')!.getImageData(c.width/2,c.height/2,1,1).data[0];}),{timeout:15000}).toBeGreaterThan(180);
@@ -67,7 +67,7 @@ try {
  await page.screenshot({path:path.join(output,'range-export.png')});
  await dialog.getByRole('button',{name:'Done',exact:true}).click();
  const missingRelative=saved.project.assets.find((a:any)=>a.kind==='image').path;await rm(path.join(moved,missingRelative));
- await page.getByRole('button',{name:'File menu'}).click();await page.getByRole('button',{name:/^打开项目/}).click();
+ await page.getByRole('button',{name:'File menu'}).click();await page.getByRole('button',{name:/^Open project/}).click();
  await expect(page.locator('[data-asset-id].is-missing')).toHaveCount(1);
  await page.locator('.project-title input').fill('素材丢失仍可保存');await page.locator('.project-title input').blur();await page.getByRole('button',{name:'Save project',exact:true}).click();
  await expect.poll(async()=>JSON.parse(await readFile(path.join(moved,'project.reacut'),'utf8')).project?.name).toBe('素材丢失仍可保存');

@@ -45,7 +45,7 @@ try {
   const imported = await save(), cues = imported.clips.filter(c => c.id !== title.id);
   await page.getByRole("textbox", { name: "Search captions", exact: true }).fill("[a].*");
   await expect(page.locator(".subtitle-cue")).toHaveCount(2);
-  await page.getByRole("checkbox", { name: "选择搜索结果", exact: true }).check();
+  await page.getByRole("checkbox", { name: "Select search results", exact: true }).check();
   await page.getByRole("tab", { name: "Find and replace", exact: true }).click();
   await page.getByRole("textbox", { name: "Find caption text", exact: true }).fill("[a].*");
   await page.getByRole("textbox", { name: "Replace caption text", exact: true }).fill("$& 字面替换");
@@ -72,17 +72,17 @@ try {
   await page.getByRole("textbox", { name: "Caption text", exact: true }).fill("逐条修订字幕");
   await page.getByRole("spinbutton", { name: "Caption start time", exact: true }).fill("3");
   await page.getByRole("spinbutton", { name: "Caption end time", exact: true }).fill("4.5");
-  await page.getByRole("button", { name: "保存此条", exact: true }).click();
+  await page.getByRole("button", { name: "Save caption", exact: true }).click();
   edited = await save(); assert.equal(edited.clips.find(c => c.id === cues[0].id)!.start, 3); assert.equal(edited.clips.find(c => c.id === cues[0].id)!.duration, 1.5);
   checks.push("single cue text and absolute range persist via native project save");
 
   await firstCue.locator(".subtitle-cue-content").click();
   await page.getByRole("textbox", { name: "Caption text", exact: true }).fill("不得覆盖新状态");
   await page.getByRole("button", { name: "Lock Captions", exact: true }).click();
-  await expect(page.getByRole("button", { name: "保存此条", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Save caption", exact: true })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Review changes", exact: true })).toBeDisabled();
   await page.getByRole("button", { name: "Unlock Captions", exact: true }).click();
-  await expect(page.getByRole("button", { name: "保存此条", exact: true })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "Save caption", exact: true })).toBeDisabled();
   checks.push("locked tracks disable edits; unlocked but stale cue forms cannot overwrite newer project state");
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
 

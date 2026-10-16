@@ -1486,7 +1486,7 @@ export default function Timeline(props: TimelineProps) {
               ? `Trim ${gesture.edge === "start" ? "start" : "end"} · ${formatTimelineTime(gesture.time, project.fps)}`
               : selectedIds.length
                 ? `${selectedIds.length} clips selected`
-                : shortcutLabel("Drag to move or trim · ⇧ multi-select · ⌥←/→ nudge by frame")}
+                : shortcutLabel("Drag to move or trim · Shift for multi-select · ⌥←/→ nudge by frame")}
         </span>
         <span>
           {project.tracks.length} tracks <i>·</i> {project.clips.length} clips{" "}

@@ -152,7 +152,7 @@ try {
   await expect(
     page.getByRole("dialog", { name: "Restore previous session", exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "恢复项目", exact: true }).click();
+  await page.getByRole("button", { name: "Restore project", exact: true }).click();
   await expect(page.locator(".project-title input")).toHaveValue(
     "保存期间继续编辑",
   );
@@ -212,7 +212,7 @@ try {
     (globalThis as any).deferSave = false;
   });
   await expect(
-    page.getByText("原项目快照已保存", { exact: true }),
+    page.getByText("Original project snapshot saved.", { exact: true }),
   ).toBeVisible();
   await setName("切换后独立的新项目");
   await app.evaluate(() => {

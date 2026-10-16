@@ -145,8 +145,8 @@ try {
       return "unexpected success";
     } catch (error) { return String(error); }
   }, { token, timelineId });
-  assert.match(await rejection(selected.token), /明确选择/);
-  assert.match(await rejection(selected.token, "..\/other"), /已有的时间线/);
+  assert.match(await rejection(selected.token), /multiple timelines|Choose which one to import/);
+  assert.match(await rejection(selected.token, "..\/other"), /not available for import/);
   const simultaneous = await page.evaluate(async (token) => Promise.all([0, 1].map(async () => {
     try {
       const result = await window.editorAPI!.readCapcutDraft(token, "active");
@@ -160,37 +160,37 @@ try {
   assert.equal(simultaneous.filter((result) => result.ok).length, 1);
   const denied = simultaneous.find((result) => !result.ok);
   assert(denied && !denied.ok);
-  assert.match(denied.error, /正在读取|已失效/);
-  assert.match(await rejection(selected.token, "active"), /已失效/);
+  assert.match(denied.error, /still loading|selection expired/);
+  assert.match(await rejection(selected.token, "active"), /selection expired/);
   await page.evaluate((token) => window.editorAPI!.discardCapcutProject(token), selected.token);
   const canceledSelection = await page.evaluate(() => window.editorAPI!.chooseCapcutProject("directory"));
   assert(canceledSelection);
   await page.evaluate((token) => window.editorAPI!.discardCapcutProject(token), canceledSelection.token);
-  assert.match(await rejection(canceledSelection.token, "active"), /已失效/);
+  assert.match(await rejection(canceledSelection.token, "active"), /selection expired/);
   const openMenuImport = async (label: string) => {
     await page!.getByRole("button", { name: "File menu", exact: true }).click();
     await page!.getByRole("button", { name: label, exact: false }).click();
   };
   const chooser = page.getByRole("dialog", { name: "Choose CapCut timeline", exact: true });
   const initialName = await page.locator(".project-title input").inputValue();
-  await openMenuImport("导入剪映项目文件夹");
+  await openMenuImport("Import CapCut project folder");
   await expect(chooser).toBeVisible();
-  await expect(chooser.getByRole("combobox", { name: "剪映时间线" })).toHaveValue("active");
+  await expect(chooser.getByRole("combobox", { name: "CapCut timeline" })).toHaveValue("active");
   await chooser.getByRole("combobox").focus();
   await page.keyboard.press("Escape");
   await expect(chooser).toHaveCount(0);
   await expect(page.locator(".project-title input")).toHaveValue(initialName);
-  await openMenuImport("导入剪映项目文件夹");
+  await openMenuImport("Import CapCut project folder");
   await expect(chooser).toBeVisible();
   await chooser.getByRole("combobox").selectOption("main");
-  await chooser.getByRole("button", { name: "导入所选时间线", exact: true }).click();
+  await chooser.getByRole("button", { name: "Import selected timeline", exact: true }).click();
   await expect(chooser).toHaveCount(0);
   await expect(page.locator(".project-title input")).toHaveValue("空白主时间线");
   await expect(page.locator(".media-item")).toHaveCount(0);
-  await openMenuImport("导入剪映项目文件夹");
+  await openMenuImport("Import CapCut project folder");
   await expect(chooser).toBeVisible();
   await page.screenshot({ path: path.join(output, "timeline-choice.png") });
-  await chooser.getByRole("button", { name: "导入所选时间线", exact: true }).click();
+  await chooser.getByRole("button", { name: "Import selected timeline", exact: true }).click();
   await expect(chooser).toHaveCount(0, { timeout: 30_000 });
   await expect(page.locator(".project-title input")).toHaveValue("有素材的当前时间线");
   await expect(page.locator(".media-item")).toHaveCount(1);
@@ -214,10 +214,10 @@ try {
   assert.equal(imported.assets[0].missing, false);
   assert(imported.assets[0].thumbnail, "Media must pass through the existing probe workflow");
   if (await page.locator(".toast").count())
-    await page.getByRole("button", { name: "关闭提示", exact: true }).click();
+    await page.getByRole("button", { name: "Dismiss notification", exact: true }).click();
   await app.evaluate((_, file) => { (globalThis as any).capcutPath = file; }, activeFile);
-  await openMenuImport("导入剪映草稿文件");
-  await expect(page.locator(".toast")).toContainText("实验性导入", { timeout: 30_000 });
+  await openMenuImport("Import CapCut draft");
+  await expect(page.locator(".toast")).toContainText("Experimental import", { timeout: 30_000 });
   await expect(chooser).toHaveCount(0);
   await page.locator(".project-title input").fill("保留当前编辑");
   await page.locator(".project-title input").blur();
@@ -226,8 +226,8 @@ try {
   const preservedProject: Project = JSON.parse(await readFile(saved, "utf8"));
   assert.equal(preservedProject.name, "保留当前编辑");
   await app.evaluate((_, file) => { (globalThis as any).capcutPath = file; }, tamperedFile);
-  await openMenuImport("导入剪映草稿文件");
-  await expect(page.locator(".toast")).toContainText("认证失败", { timeout: 30_000 });
+  await openMenuImport("Import CapCut draft");
+  await expect(page.locator(".toast")).toContainText("authentication failed", { timeout: 30_000 });
   await expect(page.locator(".project-title input")).toHaveValue("保留当前编辑");
   await expect(page.locator(".media-item")).toHaveCount(1);
   await page.screenshot({ path: path.join(output, "tampered-carrier-preserved.png") });
@@ -236,8 +236,8 @@ try {
   assert.deepEqual(JSON.parse(await readFile(saved, "utf8")), preservedProject,
     "Failed authentication must not replace the current timeline, media or edits");
   await app.evaluate((_, file) => { (globalThis as any).capcutPath = file; }, opaqueFile);
-  await openMenuImport("导入剪映草稿文件");
-  await expect(page.locator(".toast")).toContainText("不透明", { timeout: 30_000 });
+  await openMenuImport("Import CapCut draft");
+  await expect(page.locator(".toast")).toContainText("opaque payload", { timeout: 30_000 });
   await expect(page.locator(".project-title input")).toHaveValue("保留当前编辑");
   await expect(page.locator(".media-item")).toHaveCount(1);
   const unsavedName = "保留当前编辑（未保存）";
@@ -246,12 +246,12 @@ try {
   await expect(page.locator(".save-dot")).toHaveClass(/dirty/);
   const dialogsBeforeCancel = await app.evaluate(() => (globalThis as any).capcutDialogs as number);
   await page.evaluate(() => { window.confirm = () => false; });
-  await openMenuImport("导入剪映草稿文件");
+  await openMenuImport("Import CapCut draft");
   assert.equal(await app.evaluate(() => (globalThis as any).capcutDialogs), dialogsBeforeCancel);
   await expect(page.locator(".project-title input")).toHaveValue(unsavedName);
   await page.evaluate(() => { window.confirm = () => true; });
   await app.evaluate(() => { (globalThis as any).capcutCanceled = true; });
-  await openMenuImport("导入剪映草稿文件");
+  await openMenuImport("Import CapCut draft");
   await expect.poll(() => app.evaluate(() => (globalThis as any).capcutDialogs)).toBe(dialogsBeforeCancel + 1);
   await expect(page.locator(".project-title input")).toHaveValue(unsavedName);
   assert.deepEqual(await fingerprint(), before, "Selected source files must remain unchanged");

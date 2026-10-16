@@ -106,6 +106,11 @@ try {
         overlay: rect ? { x: rect.x, width: rect.width, height: rect.height } : null,
         draggable: getComputedStyle(document.querySelector(".titlebar")!).getPropertyValue("-webkit-app-region"),
         buttonDrag: getComputedStyle(document.querySelector(".export-button")!).getPropertyValue("-webkit-app-region"),
+        resourceLabelsFit: Array.from(document.querySelectorAll(".resource-tabs button"), button => {
+          const bounds = button.getBoundingClientRect();
+          const label = button.querySelector("span")!.getBoundingClientRect();
+          return label.left >= bounds.left - 1 && label.right <= bounds.right + 1;
+        }).every(Boolean),
       };
     });
     console.log("Title bar bounds:", layout);
@@ -113,6 +118,7 @@ try {
     assert(layout.nameLeft >= layout.menusRight - 1, `Project name overlaps menus at ${width}px`);
     assert.equal(layout.draggable, "drag");
     assert.equal(layout.buttonDrag, "no-drag");
+    assert(layout.resourceLabelsFit, `English library labels overlap their buttons at ${width}px`);
     if (native.platform === "win32") {
       assert.equal(layout.overlayVisible, true);
       assert(layout.overlay && layout.overlay.width < layout.width && layout.overlay.height === 44);

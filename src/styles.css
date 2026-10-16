@@ -282,7 +282,9 @@ h3:first-child {
 .resource-tabs {
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
   border-bottom: 1px solid var(--border);
   height: 52px;
   flex-shrink: 0;
@@ -295,7 +297,7 @@ h3:first-child {
   gap: 7px;
   border-radius: 6px;
   min-width: 30px;
-  flex: 1;
+  flex: 1 0 auto;
   white-space: nowrap;
   font-size: 10px;
   padding: 7px 3px;
@@ -304,6 +306,9 @@ h3:first-child {
 .resource-tabs button.active {
   background: transparent;
   color: var(--accent);
+}
+.resource-tabs::-webkit-scrollbar {
+  height: 3px;
 }
 .resource-body {
   flex: 1;
@@ -1303,7 +1308,7 @@ kbd {
 }
 
 /* Familiar desktop editing geometry: aligned panel headers and compact chrome. */
-.resource-tabs { background: #303030; padding: 3px 9px; gap: 3px; }
+.resource-tabs { background: #303030; padding: 1px 9px; gap: 3px; }
 .resource-tabs button { gap: 4px; font-size: 11px; padding: 4px 3px; }
 .resource-tabs button svg { width: 18px; height: 18px; flex-shrink: 0; }
 .panel-heading { background: #303030; font-size: 12px; }
@@ -1322,7 +1327,7 @@ kbd {
   .editor-workspace { grid-template-columns: 280px minmax(210px, 1fr) 280px; }
   .editor-workspace.assistant-open { grid-template-columns: 280px minmax(200px, 1fr) 310px; }
   .titlebar-menus { gap: 0; }
-  .resource-tabs { padding-inline: 5px; gap: 0; }
+  .resource-tabs { padding-inline: 5px; }
   .resource-tabs button { min-width: 35px; font-size: 10px; }
   .timecode { font-size: 9px; }
   .player-controls { gap: 0; padding-inline: 6px; }

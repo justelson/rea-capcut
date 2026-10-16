@@ -107,7 +107,7 @@ try {
   await page.getByRole("tab", { name: "Motion", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(4);
   await page
-    .getByRole("button", { name: "添加弹跳登场模板", exact: true })
+    .getByRole("button", { name: "Add Bouncy entrance template", exact: true })
     .click();
   let p = await save();
   assert.equal(p.clips.length, 3);
@@ -116,7 +116,7 @@ try {
   await page.getByRole("button", { name: "Undo", exact: true }).click();
   assert.equal((await save()).clips.length, 2);
   await page
-    .getByRole("button", { name: "添加轻盈升起模板", exact: true })
+    .getByRole("button", { name: "Add Gentle rise template", exact: true })
     .click();
   p = await save();
   assert(p.clips.at(-1)?.text?.text.includes("新的故事"));
@@ -130,13 +130,13 @@ try {
   await front.click({ position: { x: 25, y: 20 } });
   await page.getByRole("button", { name: "Effects", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(8);
-  await page.getByRole("button", { name: "应用暖阳调色", exact: true }).click();
+  await page.getByRole("button", { name: "Apply Warm sunlight color", exact: true }).click();
   p = await save();
   assert.equal(p.clips[0].adjustments.temperature, 0.3);
   await page.getByRole("tab", { name: "Motion effects", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(8);
   await page
-    .getByRole("button", { name: "应用呼吸缩放特效", exact: true })
+    .getByRole("button", { name: "Apply Breathing zoom effect", exact: true })
     .click();
   p = await save();
   assert.equal(
@@ -149,10 +149,10 @@ try {
   await page.getByRole("button", { name: "Transitions", exact: true }).click();
   await expect(page.locator(".creative-card")).toHaveCount(8);
   await page
-    .getByRole("spinbutton", { name: "转场时长", exact: true })
+    .getByRole("spinbutton", { name: "Transition duration", exact: true })
     .fill("0.6");
   await page
-    .getByRole("button", { name: "应用向左滑入转场", exact: true })
+    .getByRole("button", { name: "Apply Slide left transition", exact: true })
     .click();
   p = await save();
   const next = p.clips.find((c) => c.id === project.clips[1].id)!;
@@ -162,7 +162,7 @@ try {
   assert.equal((await save()).clips[1].start, 2);
   await front.click({ position: { x: 25, y: 20 } });
   await page
-    .getByRole("button", { name: "应用缩放交接转场", exact: true })
+    .getByRole("button", { name: "Apply Zoom transition", exact: true })
     .click();
   p = await save();
   assert.equal(

@@ -44,6 +44,15 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           gh run download $env:VALIDATED_RUN --repo $env:GITHUB_REPOSITORY --name Windows-packaged-app-evidence --dir evidence
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          gh run download $env:VALIDATED_RUN --repo $env:GITHUB_REPOSITORY --name Windows-test-results --dir unit-results
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $tests = Get-Content unit-results/windows-tests.json -Raw | ConvertFrom-Json
+          if (-not $tests.success -or $tests.numFailedTests -ne 0) { throw 'Unit verification report failed' }
+          @{ sourceSha = $run.head_sha; runId = $env:VALIDATED_RUN; passed = $tests.numPassedTests;
+             failed = $tests.numFailedTests; skipped = $tests.numPendingTests } |
+            ConvertTo-Json | Set-Content artifacts/UNIT-VERIFICATION.json -Encoding utf8
+          "RELEASE_TESTS=$($tests.numPassedTests)" | Add-Content $env:GITHUB_ENV
+          "RELEASE_SKIPPED=$($tests.numPendingTests)" | Add-Content $env:GITHUB_ENV
           $build = Get-Content artifacts/BUILD.json -Raw | ConvertFrom-Json
           if ($build.sourceSha -ne $run.head_sha -or "$($build.runId)" -ne $env:VALIDATED_RUN) { throw 'Artifact provenance mismatch' }
           foreach ($line in Get-Content artifacts/SHA256SUMS.txt) {
@@ -69,6 +78,8 @@ jobs:
           | ![Before](https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG/before.png) | ![After](https://github.com/$env:GITHUB_REPOSITORY/releases/download/$env:RELEASE_TAG/after.png) |
 
           Verified source: $env:RELEASE_SHA. Build and tests: https://github.com/$env:GITHUB_REPOSITORY/actions/runs/$env:VALIDATED_RUN
+
+          Regression tests: $env:RELEASE_TESTS passed, $env:RELEASE_SKIPPED platform skips, zero failures.
 
           Packaged checks cover English product flows, 1060/1280/1500px title-bar layouts, native window states, preserved user text, and a real 1280x720 MP4 export with audio. Verification JSON and SHA-256 checksums are attached.
 

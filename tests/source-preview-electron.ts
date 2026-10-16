@@ -21,10 +21,10 @@ try {
  await app.evaluate(({dialog},exported)=>{(dialog as any).showSaveDialog=async()=>({canceled:false,filePath:exported});(dialog as any).showMessageBox=async()=>({response:2});},exported);
  await expect(page.locator('[data-asset-id]')).toHaveCount(1,{timeout:30000});
  await page.locator('[data-asset-id]').click();const source=page.getByRole('region',{name:'Source preview'});
- await expect(source.getByRole('button',{name:'播放素材',exact:true})).toBeEnabled();
- await source.getByLabel('素材预览进度').fill('2');await source.focus();await page.keyboard.press('i');
- await source.getByLabel('素材预览进度').fill('3');await source.focus();await page.keyboard.press('o');
- await expect(source.getByLabel('源素材入点',{exact:true})).toHaveValue('2');await expect(source.getByLabel('源素材出点',{exact:true})).toHaveValue('3');
+ await expect(source.getByRole('button',{name:'Play media',exact:true})).toBeEnabled();
+ await source.getByLabel('Media preview position').fill('2');await source.focus();await page.keyboard.press('i');
+ await source.getByLabel('Media preview position').fill('3');await source.focus();await page.keyboard.press('o');
+ await expect(source.getByLabel('Source media start',{exact:true})).toHaveValue('2');await expect(source.getByLabel('Source media end',{exact:true})).toHaveValue('3');
  await page.screenshot({path:path.join(output,'source-preview.png')});
  await app.evaluate(({BrowserWindow})=>{const w=BrowserWindow.getAllWindows()[0];w.setMinimumSize(1024,600);w.setSize(1024,720);});
  await expect.poll(()=>page.evaluate(()=>window.innerWidth)).toBe(1024);

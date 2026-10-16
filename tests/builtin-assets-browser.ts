@@ -28,7 +28,7 @@ try {
  await page.getByRole("tab",{name:"Backgrounds",exact:true}).click();
  await expect(page.locator(".builtin-card")).toHaveCount(BUILTIN_ASSETS.filter(a=>a.category==="backgrounds").length);
  await page.getByRole("tab",{name:"All",exact:true}).click();
- await page.getByRole("textbox",{name:"搜索原创素材"}).fill("旅行");
+ await page.getByRole("textbox",{name:"Search original media"}).fill("travel");
  await expect(page.locator(".builtin-card")).toHaveCount(2);
  await expect(page.locator('[data-builtin-id="pin"]')).toBeVisible();
  await expect(page.locator('[data-builtin-id="camera"]')).toBeVisible();

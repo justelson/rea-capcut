@@ -156,7 +156,7 @@ try {
     )
     .toBe(true);
   const divider = page.getByRole("separator", {
-    name: "调整时间线高度",
+    name: "Adjust timeline height",
     exact: true,
   });
   await expect(divider).toHaveCount(1);
@@ -216,7 +216,7 @@ try {
       "isolated sandbox bridge",
       "startup .reacut argument",
       "real landscape preview and thumbnails",
-      "UI export with Chinese titles and mixed audio",
+      "UI export with English sample titles and mixed audio",
     ],
     errors,
   };

@@ -68,7 +68,10 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
           path: |
-            .test-output/package-electron/
+            .test-output/package-electron/evidence.json
+            .test-output/package-electron/editor.png
+            .test-output/package-electron/failure.png
+            .test-output/package-electron/packaged-demo.mp4
             .test-output/english-window/*.png
             .test-output/english-window/evidence.json
       - name: Record source and checksums

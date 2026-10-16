@@ -96,7 +96,7 @@ try {
     "overlapping clips must remain separately accessible",
   );
   await first.click({ position: { x: 40, y: 25 } });
-  await page.getByRole("button", { name: "应用黑白调色" }).click();
+  await page.getByRole("button", { name: "Apply Black and white color" }).click();
   assert.equal(
     (await read()).clips.find((c: any) => c.id === "first").adjustments
       .saturation,
@@ -178,7 +178,7 @@ try {
     (await read()).clips.find((c: any) => c.id === "first").duration,
     3,
   );
-  await page.getByRole("button", { name: "锁定画面 2", exact: true }).click();
+  await page.getByRole("button", { name: "Lock 画面 2", exact: true }).click();
   const locked = (await page
     .locator(".tl-track")
     .nth(1)
@@ -196,7 +196,7 @@ try {
     2,
     "keyboard cannot move locked clips",
   );
-  await page.getByRole("button", { name: "解锁画面 2", exact: true }).click();
+  await page.getByRole("button", { name: "Unlock 画面 2", exact: true }).click();
   await page.getByRole("tab", { name: "Fade in / out", exact: true }).click();
   await page
     .getByRole("button", { name: "Fade in / out", exact: true })
@@ -206,7 +206,7 @@ try {
   assert.equal(p.clips.find((c: any) => c.id === "first").fadeIn, 0.5);
   assert.equal(p.clips.find((c: any) => c.id === "first").fadeOut, 0.5);
   await page
-    .getByRole("button", { name: "添加 山间日落.mp4 到时间线" })
+    .getByRole("button", { name: "Add 山间日落.mp4 to timeline" })
     .focus();
   const before = (await read()).clips.length;
   await page.keyboard.press("Enter");
@@ -215,9 +215,9 @@ try {
     before + 1,
     "keyboard addition must run once",
   );
-  await page.getByRole("button", { name: "隐藏主画面", exact: true }).click();
+  await page.getByRole("button", { name: "Hide 主画面", exact: true }).click();
   assert.equal((await read()).tracks[0].hidden, true);
-  await page.getByRole("button", { name: "静音音乐", exact: true }).click();
+  await page.getByRole("button", { name: "Mute 音乐", exact: true }).click();
   assert.equal((await read()).tracks[2].muted, true);
   const countBeforeDrop = (await read()).clips.length;
   await page
@@ -271,7 +271,7 @@ try {
   );
   p = await read();
   const audioId = p.tracks.find((t: any) => t.kind === "audio").id;
-  await page.getByRole("button", { name: "音乐轨道操作", exact: true }).click();
+  await page.getByRole("button", { name: "音乐 track actions", exact: true }).click();
   await page.getByRole("menuitem", { name: "Rename track", exact: true }).click();
   await page
     .getByRole("textbox", { name: "Track name", exact: true })
@@ -284,7 +284,7 @@ try {
     "背景音乐",
   );
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page.getByRole("menuitem", { name: "Rename track", exact: true }).click();
   await page
@@ -299,7 +299,7 @@ try {
   );
   const originalOrder = (await read()).tracks.map((t: any) => t.id);
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page
     .getByRole("menuitem", { name: "Move track up", exact: true })
@@ -309,7 +309,7 @@ try {
     originalOrder.length - 2,
   );
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page
     .getByRole("menuitem", { name: "Move track down", exact: true })
@@ -318,17 +318,17 @@ try {
     (await read()).tracks.map((t: any) => t.id),
     originalOrder,
   );
-  await page.getByRole("button", { name: "锁定背景音乐", exact: true }).click();
+  await page.getByRole("button", { name: "Lock 背景音乐", exact: true }).click();
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
-  for (const action of ["重命名轨道", "向上移动轨道", "删除轨道"])
+  for (const action of ["Rename track", "Move track up", "Delete track"])
     await expect(
       page.getByRole("menuitem", { name: action, exact: true }),
     ).toBeDisabled();
-  await page.getByRole("button", { name: "解锁背景音乐", exact: true }).click();
+  await page.getByRole("button", { name: "Unlock 背景音乐", exact: true }).click();
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await expect(
@@ -337,7 +337,7 @@ try {
   await page.getByRole("button", { name: "Cancel", exact: true }).click();
   assert((await read()).tracks.some((t: any) => t.id === audioId));
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await page
@@ -353,7 +353,7 @@ try {
   assert(p.clips.some((c: any) => c.id === "music"));
   const emptyId = p.tracks.find((t: any) => t.kind === "text").id;
   await page
-    .getByRole("button", { name: "文字 1轨道操作", exact: true })
+    .getByRole("button", { name: "文字 1 track actions", exact: true })
     .click();
   await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   assert(!(await read()).tracks.some((t: any) => t.id === emptyId));

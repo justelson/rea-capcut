@@ -110,7 +110,7 @@ try {
     edited.clips.find((c) => c.id === project.clips[0].id)?.trackId,
     project.tracks[1].id,
   );
-  await page.getByRole("button", { name: "音乐轨道操作", exact: true }).click();
+  await page.getByRole("button", { name: "音乐 track actions", exact: true }).click();
   await page.getByRole("menuitem", { name: "Rename track", exact: true }).click();
   await page
     .getByRole("textbox", { name: "Track name", exact: true })
@@ -121,7 +121,7 @@ try {
   edited = await save();
   assert.equal(edited.tracks[2].name, "背景音乐");
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page
     .getByRole("menuitem", { name: "Move track up", exact: true })
@@ -129,7 +129,7 @@ try {
   edited = await save();
   assert.equal(edited.tracks[1].id, project.tracks[2].id);
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page
     .getByRole("menuitem", { name: "Move track down", exact: true })
@@ -139,25 +139,25 @@ try {
     edited.tracks.map((t) => t.id),
     project.tracks.map((t) => t.id),
   );
-  await page.getByRole("button", { name: "锁定背景音乐", exact: true }).click();
+  await page.getByRole("button", { name: "Lock 背景音乐", exact: true }).click();
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   for (const action of ["重命名轨道", "向上移动轨道", "删除轨道"])
     await expect(
       page.getByRole("menuitem", { name: action, exact: true }),
     ).toBeDisabled();
-  await page.getByRole("button", { name: "解锁背景音乐", exact: true }).click();
-  await page.getByRole("button", { name: "锁定叠加画面", exact: true }).click();
+  await page.getByRole("button", { name: "Unlock 背景音乐", exact: true }).click();
+  await page.getByRole("button", { name: "Lock 叠加画面", exact: true }).click();
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await expect(
     page.getByRole("menuitem", { name: "Move track up", exact: true }),
   ).toBeDisabled();
-  await page.getByRole("button", { name: "解锁叠加画面", exact: true }).click();
+  await page.getByRole("button", { name: "Unlock 叠加画面", exact: true }).click();
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await expect(
@@ -172,7 +172,7 @@ try {
     "delete shortcut must not edit selected clips while confirmation is open",
   );
   await page
-    .getByRole("button", { name: "背景音乐轨道操作", exact: true })
+    .getByRole("button", { name: "背景音乐 track actions", exact: true })
     .click();
   await page.getByRole("menuitem", { name: "Delete track", exact: true }).click();
   await page

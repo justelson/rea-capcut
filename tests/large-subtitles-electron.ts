@@ -15,7 +15,7 @@ try{
  await page.getByRole('button',{name:'Captions',exact:true}).click();await expect(page.locator('.subtitle-cue')).toHaveCount(300);
  let start=performance.now();await page.getByLabel('Search captions',{exact:true}).fill('第 300');await expect(page.locator('.subtitle-cue')).toHaveCount(1);timings.searchMs=Math.round(performance.now()-start);
  await page.locator('.subtitle-cue-content').click();await expect(page.getByLabel('Caption start time',{exact:true})).toHaveValue('897');checks.push('300 cues across 15 minutes load, filter and locate the final cue at its absolute timeline position');
- await page.getByLabel('Search captions',{exact:true}).fill('');await page.getByRole('checkbox',{name:'选择搜索结果',exact:true}).check();await page.getByLabel('Caption offset in seconds',{exact:true}).fill('1');
+ await page.getByLabel('Search captions',{exact:true}).fill('');await page.getByRole('checkbox',{name:'Select search results',exact:true}).check();await page.getByLabel('Caption offset in seconds',{exact:true}).fill('1');
  start=performance.now();await page.getByRole('button',{name:'Review changes',exact:true}).click();await page.getByRole('button',{name:'Apply 300 changes',exact:true}).click();await page.getByRole('button',{name:'Save project',exact:true}).click();
  await expect.poll(async()=>JSON.parse(await readFile(file,'utf8')).clips[0].start,{timeout:20000}).toBe(1);timings.planApplySaveMs=Math.round(performance.now()-start);
  const shifted=JSON.parse(await readFile(file,'utf8'));assert(shifted.clips.every((c:any,i:number)=>Math.abs(c.start-(i*3+1))<1e-8&&c.duration===3&&c.text.text===project.clips[i].text!.text));checks.push('one batch operation shifts all 300 cues precisely and preserves every duration and text through native save');
