@@ -1,0 +1,105 @@
+name: Windows preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    name: Package Windows x64
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Ensure Electron runtime is installed
+        run: node node_modules/electron/install.js
+      - name: Collect dependency notices
+        run: npm run licenses -- --fetch-native
+      - name: Type-check and build application
+        run: npm run build
+      - name: Package unsigned installer and standalone ZIP
+        run: npx electron-builder --win nsis zip --x64 --publish never -c.win.signAndEditExecutable=false
+      - name: Record source and checksums
+        shell: pwsh
+        run: |
+          @{
+            repository = $env:GITHUB_REPOSITORY
+            sourceSha = $env:GITHUB_SHA
+            runId = $env:GITHUB_RUN_ID
+            runAttempt = $env:GITHUB_RUN_ATTEMPT
+            platform = 'win32-x64'
+            unsignedPreview = $true
+            bundledMediaTools = $false
+          } | ConvertTo-Json | Set-Content release/BUILD.json -Encoding utf8
+          @'
+          ReaCut Windows x64 preview
+
+          Use the Setup EXE to install, or extract the ZIP and run ReaCut.exe.
+          This is an unsigned experimental build, not a verified stable release.
+          FFmpeg and FFprobe are NOT bundled in this Windows preview. Install them
+          separately or select their executable paths in ReaCut settings.
+          FFmpeg needs libx264 and AAC support for video export.
+          See the separate Windows test job for upstream regression results.
+          Packaging success does not prove all editing and export flows work.
+          BUILD.json records the exact source commit and Actions run.
+          '@ | Set-Content release/WINDOWS-PREVIEW.txt -Encoding utf8
+          Get-ChildItem release -File | Where-Object { $_.Extension -in '.exe', '.zip' } |
+            ForEach-Object { '{0}  {1}' -f (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $_.Name } |
+            Set-Content release/SHA256SUMS.txt -Encoding ascii
+          @'
+          ## Windows preview artifacts
+          Download **ReaCut-Windows-x64** below for the installer, ZIP, source metadata and checksums.
+          FFmpeg/FFprobe are not bundled; configure them in app settings.
+          This package is unsigned and experimental. Check the separate test job before treating it as verified.
+          '@ | Add-Content $env:GITHUB_STEP_SUMMARY
+      - uses: actions/upload-artifact@v7
+        with:
+          name: ReaCut-Windows-x64
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            release/*.exe
+            release/*.zip
+            release/*.blockmap
+            release/BUILD.json
+            release/SHA256SUMS.txt
+            release/WINDOWS-PREVIEW.txt
+
+  tests:
+    name: Windows upstream regressions
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - name: Install test media tools
+        shell: pwsh
+        run: |
+          choco install ffmpeg --no-progress -y
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $ffmpeg = Get-ChildItem C:/ProgramData/chocolatey/lib/ffmpeg -Filter ffmpeg.exe -Recurse | Select-Object -First 1
+          if (-not $ffmpeg) { throw 'FFmpeg executable not found after installation' }
+          $ffmpeg.DirectoryName | Add-Content $env:GITHUB_PATH
+      - name: Run upstream tests without hiding failures
+        run: npm test -- --reporter=default --reporter=json --outputFile=.test-output/windows-tests.json
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Windows-test-results
+          if-no-files-found: warn
+          retention-days: 14
+          path: .test-output/windows-tests.json
