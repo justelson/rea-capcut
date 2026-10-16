@@ -17,7 +17,7 @@ Download the installer or standalone ZIP from [Releases](https://github.com/just
 3. Open **Settings** and check both media tools. You can select their executable paths there.
 4. Import your media, edit the timeline, save a `.reacut` project, and export an MP4 or MOV.
 
-FFmpeg needs H.264 `libx264` and AAC encoding support. A silent per-user installation can use `"ReaCut Setup 0.6.0.exe" /S --current-user`; silent setup does not launch the editor.
+FFmpeg needs H.264 `libx264` and AAC encoding support. A silent per-user installation can use `"ReaCut.Setup.0.6.0.exe" /S --current-user`; silent setup does not launch the editor.
 
 Read the [English user guide](docs/USER_GUIDE.md) for editing, captions, project collection, shortcuts and export.
 
