@@ -28,6 +28,26 @@ jobs:
         run: npm run build
       - name: Package unsigned installer and standalone ZIP
         run: npx electron-builder --win nsis zip --x64 --publish never -c.win.signAndEditExecutable=false
+      - name: Install external media tools for package verification
+        shell: pwsh
+        run: |
+          choco install ffmpeg --no-progress -y
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $ffmpeg = Get-ChildItem C:/ProgramData/chocolatey/lib/ffmpeg -Filter ffmpeg.exe -Recurse | Select-Object -First 1
+          if (-not $ffmpeg) { throw 'FFmpeg executable not found after installation' }
+          $ffmpeg.DirectoryName | Add-Content $env:GITHUB_PATH
+      - name: Generate synthetic editing project
+        run: npm run demo
+      - name: Verify packaged app, preview and real video export
+        run: npx tsx tests/package-electron.ts
+      - name: Upload packaged-app evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: Windows-packaged-app-evidence
+          if-no-files-found: warn
+          retention-days: 14
+          path: .test-output/package-electron/
       - name: Record source and checksums
         shell: pwsh
         run: |

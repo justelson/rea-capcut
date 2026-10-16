@@ -4,23 +4,25 @@ import { mkdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import assert from "node:assert/strict";
 import { probeFile } from "../electron/media";
+import { resolveMediaTool } from "../electron/mediaTools";
+const windows = process.platform === "win32";
 const root = process.cwd(),
   output = path.join(root, ".test-output", "package-electron");
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
 const bundle = path.resolve(
   process.env.REACUT_TEST_APP ??
-    path.join(root, "release", "mac-arm64", "ReaCut.app"),
+    (windows ? path.join(root, "release", "win-unpacked") : path.join(root, "release", "mac-arm64", "ReaCut.app")),
 );
-const executable = path.join(bundle, "Contents", "MacOS", "ReaCut"),
+const resources = windows ? path.join(bundle, "resources") : path.join(bundle, "Contents", "Resources");
+const executable = windows ? path.join(bundle, "ReaCut.exe") : path.join(bundle, "Contents", "MacOS", "ReaCut");
+const
   demo = path.join(root, ".demo", "demo.reacut"),
   exported = path.join(output, "packaged-demo.mp4");
 await stat(executable);
 await stat(demo);
 const font = path.join(
-  bundle,
-  "Contents",
-  "Resources",
+  resources,
   "app.asar.unpacked",
   "dist",
   "fonts",
@@ -42,13 +44,21 @@ delete env.REACUT_FFMPEG;
 delete env.REACUT_FFPROBE;
 const emptyPath = path.join(output, "empty-path");
 await mkdir(emptyPath);
-env.PATH = emptyPath;
-const bundledTools = path.join(bundle, "Contents", "Resources", "media-tools");
-// The verification probe also uses the shipped executable, not Homebrew.
-process.env.REACUT_FFPROBE = path.join(bundledTools, "ffprobe");
+const bundledTools = path.join(resources, "media-tools");
+// Windows preview uses explicitly selected external tools. The macOS acceptance
+// gate still requires its own bundled executables with an empty PATH.
+const ffmpegPath = windows ? await resolveMediaTool("ffmpeg") : path.join(bundledTools, "ffmpeg");
+const ffprobePath = windows ? await resolveMediaTool("ffprobe") : path.join(bundledTools, "ffprobe");
+if (windows) {
+  env.REACUT_FFMPEG = ffmpegPath;
+  env.REACUT_FFPROBE = ffprobePath;
+} else {
+  env.PATH = emptyPath;
+}
+process.env.REACUT_FFPROBE = ffprobePath;
 const app = await electron.launch({
   executablePath: executable,
-  args: [demo],
+  args: ["--mute-audio", demo],
   cwd: output,
   env,
   timeout: 45000,
@@ -100,10 +110,10 @@ try {
   const system = await page.evaluate(() => window.editorAPI!.getSystemInfo());
   assert(
     system.ffmpeg,
-    "Packaged application must discover bundled FFmpeg/FFprobe with an empty PATH",
+    windows ? "Packaged application must discover the selected Windows FFmpeg/FFprobe" : "Packaged application must discover bundled FFmpeg/FFprobe with an empty PATH",
   );
-  assert.equal(system.ffmpegPath, path.join(bundledTools, "ffmpeg"));
-  assert.equal(system.ffprobePath, path.join(bundledTools, "ffprobe"));
+  assert.equal(system.ffmpegPath, ffmpegPath);
+  assert.equal(system.ffprobePath, ffprobePath);
   // Seek to an opaque middle frame and verify that the actual preview has color variation.
   const ruler = (await page.locator(".tl-ruler-body").boundingBox())!;
   await page.mouse.click(ruler.x + 90, ruler.y + 15);
@@ -170,6 +180,7 @@ try {
   await page.screenshot({
     path: path.join(root, "docs", "screenshots", "demo-editor.png"),
   });
+  await page.screenshot({ path: path.join(output, "editor.png") });
   await page.getByRole("button", { name: "导出", exact: true }).click();
   await page.getByRole("button", { name: "开始导出", exact: true }).click();
   await expect(page.getByText("导出完成", { exact: true })).toBeVisible({
@@ -187,7 +198,7 @@ try {
     app: bundle,
     appPath: native.path,
     packaged: native.packaged,
-    bundledMedia: { ffmpeg: system.ffmpegPath, ffprobe: system.ffprobePath, version: system.ffmpegVersion, emptyPath: true },
+    mediaTools: { bundled: !windows, ffmpeg: system.ffmpegPath, ffprobe: system.ffprobePath, version: system.ffmpegVersion, emptyPath: !windows },
     cwd: output,
     fonts: {
       browserFaces: fonts.faces,
@@ -200,8 +211,8 @@ try {
     height: video?.height,
     duration: rendered.format.duration,
     checks: [
-      "packaged .app launched outside repository cwd",
-      "bundled FFmpeg and FFprobe selected with empty PATH and no overrides",
+      "packaged application launched outside repository cwd",
+      windows ? "external Windows FFmpeg and FFprobe selected explicitly" : "bundled FFmpeg and FFprobe selected with empty PATH and no overrides",
       "native canvas and bundled font",
       "isolated sandbox bridge",
       "startup .reacut argument",
