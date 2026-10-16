@@ -45,11 +45,11 @@ describe("modern Capcut timeline selection", () => {
     });
     expect(plan.recommendedTimelineId).toBe(active);
     expect(plan.requiresTimelineChoice).toBe(true);
-    expect(() => selectCapcutTimelineDraft(plan)).toThrow("明确选择");
+    expect(() => selectCapcutTimelineDraft(plan)).toThrow("Choose which one to import");
     expect(selectCapcutTimelineDraft(plan, active)).toBe(
       `/fixtures/project/Timelines/${active}/draft_info.json`,
     );
-    expect(() => selectCapcutTimelineDraft(plan, deleted)).toThrow("清单");
+    expect(() => selectCapcutTimelineDraft(plan, deleted)).toThrow("not available for import");
   });
 
   it("recognizes root, manifest, layout and explicit timeline selections", () => {
@@ -139,7 +139,7 @@ describe("modern Capcut timeline selection", () => {
     );
     expect(malformed.recommendedTimelineId).toBe(main);
     expect(malformed.warnings).toEqual([
-      "时间线布局无法验证，已忽略活动时间线提示。",
+      "Could not verify the timeline layout. Ignored the active timeline hint.",
     ]);
   });
 
@@ -162,25 +162,25 @@ describe("modern Capcut timeline selection", () => {
       source.timelines[0].id = id;
       expect(() =>
         planCapcutProjectImport("/fixtures/project", "directory", source),
-      ).toThrow("安全");
+      ).toThrow("safe directory name");
     }
     expect(() =>
       describeCapcutProjectSelection("https://example.com/project", "file"),
-    ).toThrow("绝对路径");
+      ).toThrow("absolute path");
     const uncertain = {
       version: 0,
       timelines: [{ id: main, name: "未知状态" }],
     };
     expect(() =>
       planCapcutProjectImport("/fixtures/project", "directory", uncertain),
-    ).toThrow("删除状态");
+      ).toThrow("deleted status");
     expect(() =>
       planCapcutProjectImport(
         `/fixtures/project/Timelines/${deleted}/draft_info.json`,
         "file",
         manifest(),
       ),
-    ).toThrow("已删除");
+      ).toThrow("deleted or is missing");
   });
 
   it("bounds byte size, timeline count and duplicates before producing paths", () => {
@@ -190,7 +190,7 @@ describe("modern Capcut timeline selection", () => {
     });
     expect(() =>
       planCapcutProjectImport("/fixtures/project", "directory", oversized),
-    ).toThrow("大小限制");
+    ).toThrow("read size limit");
     expect(() =>
       planCapcutProjectImport("/fixtures/project", "directory", {
         version: 0,
@@ -199,17 +199,17 @@ describe("modern Capcut timeline selection", () => {
           is_marked_delete: false,
         })),
       }),
-    ).toThrow("数量");
+    ).toThrow("timeline import limit");
     const duplicate = manifest();
     duplicate.timelines[1].id = main.toLowerCase();
     expect(() =>
       planCapcutProjectImport("/fixtures/project", "directory", duplicate),
-    ).toThrow("重复");
+    ).toThrow("Duplicate CapCut timeline ID");
     const empty = manifest();
     empty.timelines.forEach((entry) => (entry.is_marked_delete = true));
     expect(() =>
       planCapcutProjectImport("/fixtures/project", "directory", empty),
-    ).toThrow("没有可导入");
+    ).toThrow("no undeleted timelines to import");
   });
 
   it("ignores manifest-supplied paths and preserves names strictly as labels", () => {

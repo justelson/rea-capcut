@@ -8,6 +8,7 @@ import {
   shell,
 } from "electron";
 import { startPluginHost } from "./pluginHost";
+import { windowChromeOptions } from "./windowChrome";
 import { createReadStream } from "node:fs";
 import {
   access,
@@ -52,6 +53,11 @@ import type {
 } from "../src/core/types";
 
 const pluginMode = process.argv.includes("--reacut-plugin");
+const verifyUi = process.argv.includes("--verify-ui");
+if (verifyUi) {
+  if (!process.env.REACUT_USER_DATA) throw new Error("UI verification requires an isolated user profile.");
+  app.commandLine.appendSwitch("mute-audio");
+}
 // A connected MCP server is a background app until its desktop window is shown.
 if (pluginMode && process.platform === "darwin") app.setActivationPolicy("accessory");
 if (pluginMode && !process.env.REACUT_USER_DATA)
@@ -81,17 +87,17 @@ let assistantCancelPending = false;
 let assistantStartDone: Promise<void> = Promise.resolve();
 let assistantHistoryWrites = Promise.resolve();
 function assistantHistoryFile(projectId: unknown): string {
-  if (typeof projectId !== "string" || !projectId || projectId.length > 256) throw new Error("无效项目 ID");
+  if (typeof projectId !== "string" || !projectId || projectId.length > 256) throw new Error("Invalid project ID");
   return userFile(`assistant/${createHash("sha256").update(projectId).digest("hex")}.json`);
 }
 function cleanAssistantMessages(value: unknown): AssistantMessage[] {
-  if (!Array.isArray(value) || value.length > 60) throw new Error("对话记录过大");
+  if (!Array.isArray(value) || value.length > 60) throw new Error("Conversation history is too large");
   const messages = value.map(item => {
     if (!item || !["user", "assistant"].includes(item.role) || typeof item.content !== "string" || item.content.length > 12000)
-      throw new Error("对话记录格式无效");
+      throw new Error("Invalid conversation history format");
     return { role: item.role, content: item.content } as AssistantMessage;
   });
-  if (JSON.stringify(messages).length > 250000) throw new Error("对话记录过大");
+  if (JSON.stringify(messages).length > 250000) throw new Error("Conversation history is too large");
   return messages;
 }
 let pendingProject = process.argv.find(
@@ -124,7 +130,7 @@ function validateCapcutToken(token: unknown): asserts token is string {
     typeof token !== "string" ||
     !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(token)
   )
-    throw new Error("剪映项目选择无效，请重新选择项目");
+    throw new Error("Invalid CapCut project selection. Select the project again.");
 }
 const menuAction = (action: string) =>
   window?.webContents.send("menu-action", action);
@@ -226,7 +232,7 @@ async function hydrateProject(input: unknown): Promise<Project> {
 async function readProject(file: string) {
   const metadata = await stat(file);
   if (metadata.size > 30 * 1024 * 1024)
-    throw new Error("项目文件过大（最大 30MB）");
+    throw new Error("Project file exceeds the 30 MB limit");
   const input = JSON.parse(await readFile(file, "utf8"));
   const project = await hydrateProject(await resolvePortableDocument(input, file));
   if (input?.format === "reacut-portable") portablePaths.add(path.resolve(file));
@@ -239,14 +245,14 @@ function handle(name: string, callback: (...args: any[]) => unknown) {
       event.sender !== window.webContents ||
       event.senderFrame !== window.webContents.mainFrame
     )
-      throw new Error("无效调用来源");
+      throw new Error("Invalid call origin");
     return callback(...args);
   });
 }
 function registerIPC() {
   handle("import-builtin-asset", async (id: unknown) => {
     const definition = BUILTIN_ASSETS.find(asset => asset.id === id);
-    if (!definition) throw new Error("未找到内置素材");
+    if (!definition) throw new Error("Built-in media not found");
     const source = app.isPackaged
       ? path.join(app.getAppPath().replace(/\.asar$/, ".asar.unpacked"), "dist/builtin-assets", definition.fileName)
       : path.join(__dirname, "../public/builtin-assets", definition.fileName);
@@ -260,8 +266,8 @@ function registerIPC() {
   });
   handle("assistant-providers", () => discoverAssistantProviders(assistantOverrides));
   handle("assistant-choose-cli", async (provider: AssistantProvider) => {
-    if (provider !== "codex" && provider !== "claude") throw new Error("无效助手类型");
-    const result = await dialog.showOpenDialog(window!, { title: `选择 ${provider === "codex" ? "Codex" : "Claude Code"} CLI`, properties: ["openFile"] });
+    if (provider !== "codex" && provider !== "claude") throw new Error("Invalid assistant type");
+    const result = await dialog.showOpenDialog(window!, { title: `Select the ${provider === "codex" ? "Codex" : "Claude Code"} CLI`, properties: ["openFile"] });
     if (!result.canceled) {
       assistantOverrides[provider] = result.filePaths[0];
       await mkdir(path.dirname(userFile("assistant-clis.json")), { recursive: true });
@@ -270,8 +276,8 @@ function registerIPC() {
     return discoverAssistantProviders(assistantOverrides);
   });
   handle("assistant-start", async (request: AssistantRequest) => {
-    if (assistantStarting || assistantRunning) throw new Error("助手正在处理上一条消息");
-    if (!request || typeof request.requestId !== "string" || !["codex", "claude"].includes(request.provider)) throw new Error("助手请求无效");
+    if (assistantStarting || assistantRunning) throw new Error("The assistant is still processing the previous message");
+    if (!request || typeof request.requestId !== "string" || !["codex", "claude"].includes(request.provider)) throw new Error("Invalid assistant request");
     assistantStarting = true;
     assistantPendingId = request.requestId; assistantCancelPending = false;
     let resolveStart!: () => void;
@@ -295,7 +301,7 @@ function registerIPC() {
     const file = assistantHistoryFile(projectId);
     await assistantHistoryWrites.catch(() => {});
     try {
-      if ((await stat(file)).size > 1024 * 1024) throw new Error("对话记录过大");
+      if ((await stat(file)).size > 1024 * 1024) throw new Error("Conversation history is too large");
       return cleanAssistantMessages(JSON.parse(await readFile(file, "utf8")));
     } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return []; throw error; }
   });
@@ -313,11 +319,11 @@ function registerIPC() {
     let selected = paths;
     if (!selected) {
       const result = await dialog.showOpenDialog(window!, {
-        title: "导入素材",
+        title: "Import Media",
         properties: ["openFile", "multiSelections"],
         filters: [
           {
-            name: "媒体文件",
+            name: "Media Files",
             extensions: [
               "mp4",
               "mov",
@@ -340,7 +346,7 @@ function registerIPC() {
               "heic",
             ],
           },
-          { name: "所有文件", extensions: ["*"] },
+          { name: "All Files", extensions: ["*"] },
         ],
       });
       if (result.canceled) return [];
@@ -351,14 +357,14 @@ function registerIPC() {
       selected.length > 100 ||
       selected.some((p) => typeof p !== "string" || !path.isAbsolute(p))
     )
-      throw new Error("请提供最多 100 个本地素材的绝对路径");
+      throw new Error("Provide absolute paths for up to 100 local media files");
     const assets = await importAssets(selected, cacheDir());
     assets.forEach(authorizeAsset);
     return assets;
   });
   handle("relink-asset", async (asset: MediaAsset) => {
     const result = await dialog.showOpenDialog(window!, {
-      title: `重新链接 ${asset.name}`,
+      title: `Relink ${asset.name}`,
       properties: ["openFile"],
     });
     if (result.canceled) return null;
@@ -368,7 +374,7 @@ function registerIPC() {
       (imported.kind !== asset.kind &&
         !(asset.kind === "audio" && imported.hasAudio))
     )
-      throw new Error("新素材类型与原素材不一致");
+      throw new Error("The new media type does not match the original");
     authorizeAsset(imported);
     return {
       ...imported,
@@ -388,9 +394,9 @@ function registerIPC() {
   });
   handle("open-project", async () => {
     const result = await dialog.showOpenDialog(window!, {
-      title: "打开 ReaCut 项目",
+      title: "Open ReaCut Project",
       properties: ["openFile"],
-      filters: [{ name: "ReaCut 项目", extensions: ["reacut", "json"] }],
+      filters: [{ name: "ReaCut Project", extensions: ["reacut", "json"] }],
     });
     if (result.canceled) return null;
     const file = result.filePaths[0],
@@ -399,7 +405,7 @@ function registerIPC() {
     return { project, path: file };
   });
   handle("open-recent-project", async (file: string) => {
-    if (!recentPaths.has(file)) throw new Error("项目不在最近打开列表");
+    if (!recentPaths.has(file)) throw new Error("Project is not in the recent files list");
     const project = await readProject(file);
     await remember(project, file);
     return { project, path: file };
@@ -411,19 +417,19 @@ function registerIPC() {
   });
   handle("save-project", async (input: unknown, file?: string) => {
     const project = validateProject(input);
-    if (file && !savePaths.has(file)) throw new Error("未经选择的项目保存位置");
+    if (file && !savePaths.has(file)) throw new Error("Project save location was not selected");
     if (!file) {
       const result = await dialog.showSaveDialog(window!, {
-        title: "保存项目",
+        title: "Save Project",
         defaultPath: project.name + ".reacut",
-        filters: [{ name: "ReaCut 项目", extensions: ["reacut"] }],
+        filters: [{ name: "ReaCut Project", extensions: ["reacut"] }],
       });
       if (result.canceled || !result.filePath) return null;
       file = result.filePath;
       savePaths.add(file);
     }
     if (portablePaths.has(path.resolve(file))) {
-      for (const asset of project.assets) if (!allowedMedia.has(path.resolve(asset.path))) throw new Error("项目引用了未经导入的素材");
+      for (const asset of project.assets) if (!allowedMedia.has(path.resolve(asset.path))) throw new Error("Project references media that has not been imported");
       await savePortableDocument(project, file);
     } else await atomicWrite(file, JSON.stringify(project, null, 2));
     await remember(project, file);
@@ -431,8 +437,8 @@ function registerIPC() {
   });
   handle("package-project", async (input: unknown) => {
     const project = validateProject(input), owner = window!.webContents;
-    for (const asset of project.assets) if (!allowedMedia.has(path.resolve(asset.path))) throw new Error("项目引用了未经导入的素材");
-    const selected = await dialog.showOpenDialog(window!, { title: "选择素材包保存位置", properties: ["openDirectory", "createDirectory"] });
+    for (const asset of project.assets) if (!allowedMedia.has(path.resolve(asset.path))) throw new Error("Project references media that has not been imported");
+    const selected = await dialog.showOpenDialog(window!, { title: "Choose a folder for the media package", properties: ["openDirectory", "createDirectory"] });
     if (selected.canceled || !selected.filePaths[0] || owner.isDestroyed()) return null;
     return startPortablePackage(project, selected.filePaths[0], event => {
       if (event.status === "complete" && event.path) outputPaths.add(event.path);
@@ -456,11 +462,11 @@ function registerIPC() {
     }
   });
   handle("choose-export-path", async (name: string, format: string) => {
-    if (!["mp4", "mov"].includes(format)) throw new Error("无效导出格式");
+    if (!["mp4", "mov"].includes(format)) throw new Error("Invalid export format");
     const result = await dialog.showSaveDialog(window!, {
-      title: "导出视频",
+      title: "Export Video",
       defaultPath: name + "." + format,
-      filters: [{ name: format.toUpperCase() + " 视频", extensions: [format] }],
+      filters: [{ name: format.toUpperCase() + " Video", extensions: [format] }],
     });
     if (result.canceled || !result.filePath) return null;
     outputPaths.add(result.filePath);
@@ -468,10 +474,10 @@ function registerIPC() {
   });
   handle("export-project", async (input: unknown, options: ExportOptions) => {
     const project = validateProject(input);
-    if (!outputPaths.has(options.path)) throw new Error("请先选择导出位置");
+    if (!outputPaths.has(options.path)) throw new Error("Choose an export location first");
     for (const asset of project.assets)
       if (!allowedMedia.has(path.resolve(asset.path)))
-        throw new Error("导出引用了未经导入的素材");
+        throw new Error("Export references media that has not been imported");
     return startExport(project, options, (event) =>
       window?.webContents.send("export-progress", event),
     );
@@ -488,26 +494,26 @@ function registerIPC() {
       !Array.isArray(extensions) ||
       extensions.some((e) => !/^[a-z0-9]+$/i.test(e))
     )
-      throw new Error("无效文件类型");
+      throw new Error("Invalid file type");
     const result = await dialog.showOpenDialog(window!, {
       properties: ["openFile"],
-      filters: [{ name: "文本文件", extensions }],
+      filters: [{ name: "Text Files", extensions }],
     });
     if (result.canceled) return null;
     const file = result.filePaths[0];
     if ((await stat(file)).size > 20 * 1024 * 1024)
-      throw new Error("文件超过 20MB");
+      throw new Error("File exceeds the 20 MB limit");
     return { text: await readFile(file, "utf8"), name: path.basename(file) };
   });
   handle("choose-capcut-project", async (mode: "file" | "directory") => {
     if (mode !== "file" && mode !== "directory")
-      throw new Error("请选择草稿文件或项目文件夹");
+      throw new Error("Select a draft file or project folder");
     const owner = window!;
     const result = await dialog.showOpenDialog(owner, {
-      title: mode === "file" ? "选择剪映草稿文件" : "选择剪映项目文件夹",
+      title: mode === "file" ? "Select a CapCut draft file" : "Select a CapCut project folder",
       properties: [mode === "file" ? "openFile" : "openDirectory"],
       ...(mode === "file"
-        ? { filters: [{ name: "剪映草稿", extensions: ["json"] }] }
+        ? { filters: [{ name: "CapCut Draft", extensions: ["json"] }] }
         : {}),
     });
     if (result.canceled || !result.filePaths[0]) return null;
@@ -544,14 +550,14 @@ function registerIPC() {
     pruneCapcutSelections();
     const selection = capcutSelections.get(token);
     if (!selection || selection.ownerId !== window!.webContents.id)
-      throw new Error("剪映项目选择已失效，请重新选择项目");
-    if (selection.reading) throw new Error("所选时间线正在读取，请稍候");
+      throw new Error("CapCut project selection expired. Select the project again.");
+    if (selection.reading) throw new Error("The selected timeline is still loading. Please wait.");
     if (
       timelineId !== undefined &&
       (typeof timelineId !== "string" ||
         !selection.plan.timelines.some((choice) => choice.id === timelineId))
     )
-      throw new Error("请选择项目中已有的时间线");
+      throw new Error("Select a timeline in the project");
     selection.reading = true;
     try {
       const result = await readSelectedCapcutTimeline(
@@ -577,7 +583,7 @@ function registerIPC() {
   });
   handle("write-text-file", async (text: string, name: string) => {
     if (typeof text !== "string" || text.length > 20 * 1024 * 1024)
-      throw new Error("文本内容无效或过大");
+      throw new Error("Text is invalid or too long");
     const result = await dialog.showSaveDialog(window!, {
       defaultPath: path.basename(name),
     });
@@ -591,13 +597,13 @@ function registerIPC() {
       !savePaths.has(file) &&
       !outputPaths.has(file)
     )
-      throw new Error("未授权的文件位置");
+      throw new Error("File location is not authorized");
     shell.showItemInFolder(file);
   });
   handle("choose-media-tool", async (name: string) => {
-    if (!["ffmpeg", "ffprobe"].includes(name)) throw new Error("无效工具名");
+    if (!["ffmpeg", "ffprobe"].includes(name)) throw new Error("Invalid tool name");
     const result = await dialog.showOpenDialog(window!, {
-      title: `选择 ${name} 可执行文件`,
+      title: `Select the ${name} executable`,
       properties: ["openFile"],
     });
     if (result.canceled) return null;
@@ -694,22 +700,22 @@ function createWindow() {
   window = new BrowserWindow({
     width: pluginMode ? 1440 : 1500,
     height: pluginMode ? 900 : 950,
-    show: !pluginMode,
+    show: !pluginMode && !verifyUi,
     minWidth: 1060,
     minHeight: 680,
-    title: "ReaCut · 映刻",
+    title: "ReaCut",
     backgroundColor: "#141518",
-    titleBarStyle: "hiddenInset",
-    trafficLightPosition: { x: 16, y: 17 },
+    ...windowChromeOptions(),
     webPreferences: {
       preload: path.join(directory, "preload.cjs"),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
-      backgroundThrottling: !pluginMode,
+      backgroundThrottling: !pluginMode && !verifyUi,
       additionalArguments: pluginMode ? ["--reacut-plugin"] : [],
     },
   });
+  if (verifyUi) window.webContents.setAudioMuted(true);
   if (pluginMode) {
     if (process.platform === "darwin") {
       window.on("show", () => app.setActivationPolicy("regular"));
@@ -730,9 +736,9 @@ function createWindow() {
     void dialog
       .showMessageBox(window!, {
         type: "question",
-        message: "项目有未保存的修改",
-        detail: "保存项目后再关闭？最近编辑也会自动恢复。",
-        buttons: ["保存并关闭", "取消", "不保存"],
+        message: "You have unsaved changes",
+        detail: "Save your project before closing? Recent edits are also saved for recovery.",
+        buttons: ["Save and close", "Cancel", "Discard changes"],
         defaultId: 0,
         cancelId: 1,
       })
@@ -806,59 +812,59 @@ void app.whenReady().then(async () => {
         ]
       : []),
     {
-      label: "文件",
+      label: "File",
       submenu: [
         {
-          label: "新建项目",
+          label: "New Project",
           accelerator: "CmdOrCtrl+N",
           click: () => menuAction("new"),
         },
         {
-          label: "打开项目",
+          label: "Open Project",
           accelerator: "CmdOrCtrl+O",
           click: () => menuAction("open"),
         },
         {
-          label: "保存",
+          label: "Save",
           accelerator: "CmdOrCtrl+S",
           click: () => menuAction("save"),
         },
         {
-          label: "另存为",
+          label: "Save As",
           accelerator: "CmdOrCtrl+Shift+S",
           click: () => menuAction("save-as"),
         },
         { type: "separator" },
         {
-          label: "导入素材",
+          label: "Import Media",
           accelerator: "CmdOrCtrl+I",
           click: () => menuAction("import"),
         },
         {
-          label: "导入剪映草稿文件…",
+          label: "Import CapCut Draft…",
           click: () => menuAction("import-capcut-file"),
         },
         {
-          label: "导入剪映项目文件夹…",
+          label: "Import CapCut Project Folder…",
           click: () => menuAction("import-capcut-directory"),
         },
         {
-          label: "导出视频",
+          label: "Export Video",
           accelerator: "CmdOrCtrl+E",
           click: () => menuAction("export"),
         },
       ],
     },
     {
-      label: "编辑",
+      label: "Edit",
       submenu: [
         {
-          label: "撤销",
+          label: "Undo",
           accelerator: "CmdOrCtrl+Z",
           click: () => menuAction("undo"),
         },
         {
-          label: "重做",
+          label: "Redo",
           accelerator: "CmdOrCtrl+Shift+Z",
           click: () => menuAction("redo"),
         },
@@ -870,7 +876,7 @@ void app.whenReady().then(async () => {
       ],
     },
     {
-      label: "窗口",
+      label: "Window",
       submenu: [
         { role: "minimize" },
         { role: "togglefullscreen" },
@@ -880,10 +886,10 @@ void app.whenReady().then(async () => {
       ],
     },
     {
-      label: "帮助",
+      label: "Help",
       submenu: [
-        { label: "快捷键", click: () => menuAction("shortcuts") },
-        { label: "关于 ReaCut", click: () => menuAction("about") },
+        { label: "Keyboard Shortcuts", click: () => menuAction("shortcuts") },
+        { label: "About ReaCut", click: () => menuAction("about") },
       ],
     },
   ];

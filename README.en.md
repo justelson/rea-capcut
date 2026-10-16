@@ -1,146 +1,64 @@
-<p align="center">
-  <img src="public/icons/reacut.png" width="96" height="96" alt="ReaCut icon" />
-</p>
-<h1 align="center">ReaCut</h1>
-<p align="center"><strong>An independent, open-source video editor rebuilt from <a href="https://github.com/morluto/rea">REA</a>-assisted research into Jianying / CapCut.</strong><br />macOS first. Research is limited to authorized scope, without copying proprietary Jianying / CapCut code or assets.</p>
-<p align="center">Building a complete video editor is a substantial undertaking, and this project is still in its early stages.<br /><strong>Contributors are welcome to help with features, usability, cross-platform support, tests and documentation.</strong> <a href="#contributing">Get involved →</a></p>
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/source_license-MIT-45d6c0" alt="Source license: MIT" /></a>
-  <img src="https://img.shields.io/badge/status-early_development-orange" alt="Status: early development" />
-  <img src="https://img.shields.io/badge/verified-macOS_arm64-333333" alt="Verified platform: macOS arm64" />
-</p>
-<p align="center">
-  <a href="README.md">简体中文</a> · English<br />
-  <a href="#getting-started">Getting started</a> · <a href="docs/USER_GUIDE.md">User guide</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="#contributing">Contributing</a>
-</p>
+# ReaCut
 
-![ReaCut media library, player, inspector and multitrack timeline](docs/screenshots/ui-parity-editor.png)
+An offline desktop video editor with a media library, multitrack timeline, editable captions, effects and local video export.
 
-ReaCut brings media management, multitrack editing, subtitles and video export into a familiar desktop workspace. Core editing runs locally, without an account or cloud service.
+This is [Elson's English Windows fork](https://github.com/justelson/rea-capcut) of [ReaCut by Xiangyu-CAS](https://github.com/Xiangyu-CAS/rea-capcut). The original project used [REA](https://github.com/morluto/rea) to research CapCut's behavior and project formats, then independently implemented its editor. No CapCut proprietary code or assets are included. You do not need REA, Ghidra or CapCut to run ReaCut.
 
-The project uses [REA](https://github.com/morluto/rea) to study Jianying's interface behavior and local project formats, then independently implements an editor with Electron, React, TypeScript and FFmpeg. REA supports development research; REA, Ghidra and Jianying are not runtime dependencies.
+## Windows edition
 
-> **Status: v0.5.0, early development.** macOS Apple Silicon is verified. Windows / Linux build configurations are available but await testing on those platforms. Download the [v0.5.0 preview release](https://github.com/Xiangyu-CAS/rea-capcut/releases/tag/v0.5.0), or follow the source instructions below.
+Version **0.6.0** makes product text English throughout the editor, native menus, dialogs, validation messages, presets and optional assistant. Existing project names, filenames, captions and other user content keep their original language.
 
-## Features
+The custom title bar uses native Windows caption buttons, including maximize and Snap support. macOS keeps its traffic lights on the left; Linux uses Electron's native window-controls overlay. Windows is the release target for this fork. Cross-platform source support does not mean Mac and Linux packages have been tested.
 
-| Area | What you can do |
-| --- | --- |
-| **Media and source preview** | Import video, audio and images with thumbnails and waveforms; mark source in/out points with I/O and insert the selected range. |
-| **Multitrack editing** | Drag, trim, split, duplicate, select multiple clips, snap, lock tracks, mute, undo and redo. |
-| **Picture and sound** | Transform, crop, apply basic color adjustments, chroma key, rectangle / ellipse masks, keyframes, volume, fades and constant speed changes. |
-| **Text and subtitles** | Import SRT / basic WebVTT, edit individual cues, batch-replace text, shift timing, copy styles and export SRT. |
-| **Local projects** | Save `.reacut` projects, recover edits, relink media and collect project media into a portable folder. |
-| **Video export** | Render the full timeline, a selection or a custom range to MP4 / MOV with H.264 and AAC. |
-| **Text & effect libraries** | 16 editable text templates, 16 color / motion presets, and 8 transitions with animated previews and one-step undo. |
-| **Offline assets** | Use 64 original stickers, backgrounds, title plates and synthesized sounds, plus the bundled Noto Sans SC font. |
-| **Optional editing assistant** | Connect an installed, authenticated Codex CLI / Claude Code; review edit proposals before applying them and undo in one step. |
+Download the installer or standalone ZIP from [Releases](https://github.com/justelson/rea-capcut/releases). Release packages include source/build metadata and SHA-256 checksums. Windows preview builds are unsigned.
 
-See the [feature matrix](docs/FEATURE_MATRIX.md) for detailed support and limitations.
+1. Run the Setup EXE, or extract the standalone ZIP and open `ReaCut.exe`.
+2. Install FFmpeg and FFprobe separately. Windows packages currently do not bundle them.
+3. Open **Settings** and check both media tools. You can select their executable paths there.
+4. Import your media, edit the timeline, save a `.reacut` project, and export an MP4 or MOV.
 
-## Getting started
+FFmpeg needs H.264 `libx264` and AAC encoding support. A silent per-user installation can use `"ReaCut Setup 0.6.0.exe" /S --current-user`; silent setup does not launch the editor.
 
-### Option 1: standalone DMG
+Read the [English user guide](docs/USER_GUIDE.md) for editing, captions, project collection, shortcuts and export.
 
-Download the [ReaCut 0.5.0 DMG for macOS Apple Silicon](https://github.com/Xiangyu-CAS/rea-capcut/releases/download/v0.5.0/ReaCut-0.5.0-arm64.dmg), open it, drag the app into Applications, and launch it. FFmpeg and FFprobe are bundled. This preview is ad-hoc signed and is not Apple-notarized.
+## Editing tools
 
-### Option 2: inside the Codex side panel
+- Video, audio and image import; source preview with in/out points; thumbnails and waveforms.
+- Multitrack drag, trim, split, duplicate, multiselect, snapping, lock, mute, hide, undo and redo.
+- Position, scale, rotation, opacity, cropping, chroma key, rectangle/ellipse masks and keyframes.
+- Volume, fades, constant speed changes, color adjustments, text templates, effects and transitions.
+- SRT/basic WebVTT captions, batch replacements, caption export and local project recovery.
+- Missing-media relinking, portable media collection, full-timeline and range export.
 
-Install **ReaCut 0.5.0+**, Codex desktop, its `codex` CLI, and Python 3. Download the [Codex plugin ZIP](https://github.com/Xiangyu-CAS/rea-capcut/releases/download/v0.5.0/ReaCut-plugin-0.5.0.zip), then run from its extracted directory or this repository:
+This remains an early editor. It does not implement every CapCut feature, professional HDR/color management, cloud projects, automatic speech captions or AI portrait cutout. Experimental CapCut/Jianying draft import is lossy and does not promise compatibility with arbitrary versions or projects.
 
-```sh
-sh scripts/install-plugin.sh
-```
+## Build from source
 
-Reconnect or open a new Codex chat and ask: **“Open ReaCut in the side panel.”** Use the full editor directly with the mouse and keyboard, or ask Codex to make reversible timeline edits. If the app is elsewhere, pass `--app /absolute/path/ReaCut.app`.
-
-The plugin runs the local editor in a separate session. Its interactive stream is about 6 fps; file selection uses native dialogs, and audio plays locally. Codex receives requested project summaries, text, and explicit screenshots. See the [plugin guide](docs/CODEX_PLUGIN.md) for setup, data boundaries, and limitations.
-
-### Run from source
-
-Clone or download this repository, then run the following commands in its directory. Requirements:
-
-- **Node.js 26**, or **Node.js 24.x starting at 24.11**, and npm.
-- **FFmpeg and FFprobe**, with `libx264` and AAC encoding enabled in FFmpeg.
+Use Node.js 26, or Node.js 24.11+ within the 24.x release line, plus npm, FFmpeg and FFprobe.
 
 ```sh
 npm ci
+node node_modules/electron/install.js
 npm run dev
 ```
 
-This launches the Electron editor and the local Vite development server. Put the media tools on `PATH` or select their paths in application settings; see [media tools](docs/MEDIA_TOOLS.md).
-
-To try a complete example project:
-
 ```sh
+npm run check
 npm run demo
+npm run test:desktop
+npx electron-builder --win nsis zip --x64 --publish never
 ```
 
-Open `.demo/demo.reacut` in ReaCut. It includes programmatically generated original footage, music, subtitles and keyframes. See the [demo guide](docs/DEMO.md).
+The **Windows preview** Actions workflow builds the installer and ZIP, runs core tests, and checks the actual packaged app with generated media. Its evidence separates packaging, editing, rendered UI and export results. See [the workflow](.github/workflows/windows-preview.yml).
 
-### Build a macOS installer
+## Data and optional assistant
 
-Install Xcode command line tools on a native macOS host, then run:
+Ordinary editing and media export run locally. Projects reference source files unless you collect them into a portable folder. The optional editing assistant uses an installed, authenticated Codex or Claude CLI only when you send a request; prompts, bounded conversation history and a project summary then go to that service. Raw media is not attached by this path.
 
-```sh
-npm run dist:mac:installer
-```
+The optional Codex side-panel plugin is separate from ordinary desktop editing. Its Windows host behavior is not part of the desktop release guarantee.
 
-DMG and ZIP files are written to `release/`. The first build downloads and compiles bundled FFmpeg / FFprobe; installer users do not need to install media tools separately. Open the DMG and drag ReaCut into Applications.
+## Source and licenses
 
-Current builds use local ad-hoc signing and are not Apple-notarized. See [validation](docs/VALIDATION.md) and [media tools](docs/MEDIA_TOOLS.md) for platform coverage and build details.
+Editor UI lives in `src/components`, editing state in `src/editor`, project/timeline logic in `src/core`, and file/media integration in `electron`. The English fork's title-bar code is in `src/window` and `electron/windowChrome.ts`.
 
-## Projects and data
-
-- **Local editing:** media processing, preview, project storage and export run on your machine. Ordinary projects reference local media; collect project media or relink files when moving between machines.
-- **Optional assistant:** when you send a message, text and a limited timeline summary are sent to the selected CLI service. Media files are not attached. See the [assistant guide](docs/ASSISTANT.md).
-- **Experimental Jianying import:** converts basic clips from verified formats. Complex text styles, effects and keyframes may be lost; writing back to Jianying format is unsupported. See [interoperability](docs/CAPCUT_INTEROP.md) for version coverage.
-
-Cloud sync, SaaS, direct AI API integration, speech-to-subtitle transcription and AI portrait cutout are not implemented. ReaCut is an independent project and is not affiliated with Jianying / CapCut.
-
-## Development
-
-```sh
-npm run check          # Type checks, unit tests and production build
-npm run test:desktop   # Build and test the basic desktop workflow
-npm run check:desktop  # Full desktop regression suite
-```
-
-See [validation](docs/VALIDATION.md) for specialized tests, prerequisites and recorded results.
-
-```text
-src/components/   Editor interface
-src/editor/       State, undo/redo and preview
-src/core/         Project model, timeline, subtitles and visual processing
-electron/         Local file bridge, media processing and export
-scripts/          Asset, icon and package build tools
-tests/            Core logic, media and desktop workflow tests
-docs/             User guides, architecture and research notes
-```
-
-## Contributing
-
-Bug reports, documentation improvements and pull requests are welcome. Useful areas include Windows / Linux testing, large-project performance, editing interactions and accessibility.
-
-1. Include your OS, ReaCut version, reproduction steps and expected behavior in bug reports. For media issues, use a minimal sample that can be shared publicly.
-2. Discuss substantial feature changes in an issue before starting a large implementation.
-3. Run `npm run check` for code changes. For desktop interactions or export changes, run the relevant workflow checks and describe the results in your PR.
-
-Use media you own or can redistribute. Keep private projects, caches, credentials and raw `.research/` data out of contributions.
-
-## Documentation
-
-Most detailed guides are currently in Chinese.
-
-| Audience | Guides |
-| --- | --- |
-| Users | [User guide](docs/USER_GUIDE.md) · [Demo project](docs/DEMO.md) · [Editing assistant](docs/ASSISTANT.md) |
-| Capabilities and progress | [Feature matrix](docs/FEATURE_MATRIX.md) · [Changelog](CHANGELOG.md) · [Validation](docs/VALIDATION.md) |
-| Developers | [Architecture](docs/ARCHITECTURE.md) · [Media tools](docs/MEDIA_TOOLS.md) · [Offline assets](docs/ORIGINAL_ASSETS.md) |
-| REA research and interoperability | [REA findings](docs/research/REA_FINDINGS.md) · [Interface comparison](docs/UI_PARITY.md) · [Draft interoperability](docs/CAPCUT_INTEROP.md) |
-
-## License and acknowledgments
-
-ReaCut's own source code is licensed under the [MIT License](LICENSE). Third-party components retain their respective licenses: bundled FFmpeg / x264 use GPL, and Noto Sans SC uses SIL OFL 1.1. Notices, licenses and corresponding media-tool sources accompany the package; see [third-party notices](THIRD_PARTY_NOTICES.md).
-
-Thanks to [REA](https://github.com/morluto/rea) and the Electron, React, FFmpeg, Zustand, Lucide and Noto communities.
+Original source uses the [MIT license](LICENSE). Dependencies retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md). The original [Chinese README](README.zh-CN.md), [Chinese user guide](docs/USER_GUIDE.zh-CN.md), and historical research documents remain available for provenance. They describe upstream work and should not be treated as current Windows acceptance evidence.

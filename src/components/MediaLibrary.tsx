@@ -103,7 +103,7 @@ export default function MediaLibrary({
         data-asset-id={asset.id}
         role="button"
         tabIndex={0}
-        aria-label={`${asset.name}，${asset.kind === "audio" ? "音频" : asset.kind === "image" ? "图片" : "视频"}${asset.missing ? "，文件丢失" : ""}`}
+        aria-label={`${asset.name}, ${asset.kind === "audio" ? "Audio" : asset.kind === "image" ? "Image" : "Video"}${asset.missing ? ", file missing" : ""}`}
         aria-pressed={selected === asset.id}
         className={`media-item media-item-${asset.kind} ${selected === asset.id ? "is-selected" : ""} ${asset.missing ? "is-missing" : ""}`}
         draggable={!asset.missing}
@@ -187,19 +187,19 @@ export default function MediaLibrary({
           </span>
           <span className="media-time">
             {asset.kind === "image"
-              ? "图片"
+              ? "Image"
               : formatMediaDuration(asset.duration)}
           </span>
           {inTimeline && (
-            <span className="media-used" title="已用于时间线">
+            <span className="media-used" title="Used on timeline">
               <Check size={10} />
             </span>
           )}
-          {asset.missing && <span className="media-missing">文件丢失</span>}
+          {asset.missing && <span className="media-missing">File missing</span>}
           <button
             className="media-add"
-            aria-label={`添加 ${asset.name} 到时间线`}
-            title="添加到播放位置 · 双击素材"
+            aria-label={`Add ${asset.name} to timeline`}
+            title="Add at playhead · Double-click to preview"
             disabled={asset.missing}
             onClick={(event) => {
               event.stopPropagation();
@@ -215,7 +215,7 @@ export default function MediaLibrary({
           </span>
           <span className="media-metadata">
             {asset.kind === "audio"
-              ? "音频"
+              ? "Audio"
               : `${asset.width} × ${asset.height}`}{" "}
             {asset.kind === "video" && asset.fps > 0
               ? `· ${Math.round(asset.fps * 100) / 100} fps`
@@ -224,8 +224,8 @@ export default function MediaLibrary({
         </div>
         <button
           className="media-more"
-          title="素材操作"
-          aria-label={`${asset.name} 操作`}
+          title="Media options"
+          aria-label={`${asset.name} options`}
           aria-expanded={menu === asset.id}
           onClick={(event) => {
             event.stopPropagation();
@@ -240,7 +240,7 @@ export default function MediaLibrary({
             className="media-context"
             onClick={(event) => event.stopPropagation()}
           >
-            {onPreviewAsset && <button onClick={() => { onPreviewAsset(asset.id);setMenu(null); }}><Play size={13} /> 预览素材</button>}
+            {onPreviewAsset && <button onClick={() => { onPreviewAsset(asset.id);setMenu(null); }}><Play size={13} /> Preview media</button>}
             <button
               disabled={asset.missing}
               onClick={() => {
@@ -248,7 +248,7 @@ export default function MediaLibrary({
                 setMenu(null);
               }}
             >
-              <Plus size={13} /> 添加到时间线
+              <Plus size={13} /> Add to timeline
             </button>
             {onRevealAsset && (
               <button
@@ -258,7 +258,7 @@ export default function MediaLibrary({
                 }}
               >
                 <FolderOpen size={13} />{" "}
-                {asset.missing ? "重新链接素材" : "在文件夹中显示"}
+                {asset.missing ? "Relink media" : "Show in folder"}
               </button>
             )}
             <button
@@ -269,7 +269,7 @@ export default function MediaLibrary({
                 if (selected === asset.id) setSelected(null);
               }}
             >
-              <Trash2 size={13} /> 从素材库移除
+              <Trash2 size={13} /> Remove from media library
             </button>
           </div>
         )}
@@ -279,7 +279,7 @@ export default function MediaLibrary({
   return (
     <section
       className={`media-library ${draggingFiles ? "is-file-drop" : ""}`}
-      aria-label="本地素材库"
+      aria-label="Local media library"
       onDragEnter={(event) => {
         if (event.dataTransfer.types.includes("Files")) {
           event.preventDefault();
@@ -315,7 +315,7 @@ export default function MediaLibrary({
       <div className="media-top">
         <div className="media-top-title">
           <FolderOpen size={15} />
-          <span>项目素材</span>
+          <span>Project media</span>
           <b>{project.assets.length}</b>
         </div>
         <button
@@ -328,36 +328,36 @@ export default function MediaLibrary({
           ) : (
             <Plus size={13} />
           )}{" "}
-          {importing ? "导入中" : "导入素材"}
+          {importing ? "Importing…" : "Import media"}
         </button>
       </div>
       <div className="media-tools">
         <div className="media-search">
           <Search size={13} />
           <input
-            aria-label="搜索素材"
-            placeholder="搜索素材"
+            aria-label="Search media"
+            placeholder="Search media"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
           {query && (
-            <button aria-label="清空搜索" onClick={() => setQuery("")}>
+            <button aria-label="Clear search" onClick={() => setQuery("")}>
               <X size={12} />
             </button>
           )}
         </div>
         <div className="media-view">
           <button
-            title="网格视图"
-            aria-label="网格视图"
+            title="Grid view"
+            aria-label="Grid view"
             className={view === "grid" ? "is-active" : ""}
             onClick={() => setView("grid")}
           >
             <Grid2X2 size={14} />
           </button>
           <button
-            title="列表视图"
-            aria-label="列表视图"
+            title="List view"
+            aria-label="List view"
             className={view === "list" ? "is-active" : ""}
             onClick={() => setView("list")}
           >
@@ -365,7 +365,7 @@ export default function MediaLibrary({
           </button>
         </div>
       </div>
-      <div className="media-filters" role="tablist" aria-label="素材类型">
+      <div className="media-filters" role="tablist" aria-label="Media type">
         {(["all", "video", "audio", "image"] as const).map((value) => (
           <button
             role="tab"
@@ -375,12 +375,12 @@ export default function MediaLibrary({
             onClick={() => setKind(value)}
           >
             {value === "all"
-              ? "全部"
+              ? "All"
               : value === "video"
-                ? "视频"
+                ? "Video"
                 : value === "audio"
-                  ? "音频"
-                  : "图片"}
+                  ? "Audio"
+                  : "Image"}
             {value !== "all" && (
               <span>
                 {project.assets.filter((a) => a.kind === value).length}
@@ -403,15 +403,15 @@ export default function MediaLibrary({
         ) : project.assets.length > 0 ? (
           <div className="media-empty">
             <Search size={26} />
-            <strong>没有找到匹配素材</strong>
-            <p>试试其他关键词或素材类型</p>
+            <strong>No matching media found</strong>
+            <p>Try another search or media type</p>
             <button
               onClick={() => {
                 setQuery("");
                 setKind("all");
               }}
             >
-              查看全部素材
+              Show all media
             </button>
           </div>
         ) : (
@@ -421,32 +421,32 @@ export default function MediaLibrary({
               <Music2 size={18} />
               <FileImage size={19} />
             </div>
-            <strong>把灵感放进这里</strong>
+            <strong>Bring your ideas here</strong>
             <p>
-              导入视频、音频和图片
+              Import video, audio, and images
               <br />
-              或直接拖入本地文件
+              Or drag in local files
             </p>
             <button
               className="media-empty-import"
               onClick={startImport}
               disabled={importing}
             >
-              <Upload size={13} /> {importing ? "正在读取素材…" : "导入素材"}
+              <Upload size={13} /> {importing ? "Loading media…" : "Import media"}
             </button>
-            <span>支持 MP4、MOV、MP3、PNG 等格式</span>
+            <span>Supports MP4, MOV, MP3, PNG, and more</span>
           </div>
         )}
       </div>
       <div className="media-footer">
-        <span>{filtered.length} 个素材</span>
-        <span>双击添加 · 拖动到时间线</span>
+        <span>{filtered.length} items</span>
+        <span>Double-click to add · Drag to timeline</span>
       </div>
       {draggingFiles && (
         <div className="media-drop-overlay">
           <Upload size={31} />
-          <strong>松开以导入素材</strong>
-          <span>文件保留在本地，随时开始编辑</span>
+          <strong>Release to import media</strong>
+          <span>Files stay on your device, ready to edit</span>
         </div>
       )}
     </section>

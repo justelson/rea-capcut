@@ -11,7 +11,7 @@ describe("bundled original assets", () => {
     for(const a of BUILTIN_ASSETS) expect(a.fileName).toMatch(/^[a-z][a-z0-9-]+\.(png|wav)$/);
     expect(filterBuiltinAssets("all", " SPARKLE ").map(a=>a.id)).toEqual(["sparkle"]);
     expect(filterBuiltinAssets("stickers", "sparkle").map(a=>a.id)).toEqual(["sparkle"]);
-    expect(filterBuiltinAssets("sounds", "转场").length).toBeGreaterThan(1);
+    expect(filterBuiltinAssets("sounds", "transition").length).toBeGreaterThan(1);
     expect(findBuiltinAsset("../../etc/passwd")).toBeUndefined();
   });
   it("all manifest fingerprints match packaged bytes and editable SVG contains no external links", async () => {

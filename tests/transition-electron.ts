@@ -111,13 +111,13 @@ try {
   await page
     .locator(`[data-clip-id="${front.id}"]`)
     .click({ position: { x: 25, y: 25 } });
-  await page.getByRole("button", { name: "转场", exact: true }).click();
-  await page.getByRole("button", {name:"应用叠化转场",exact:true}).click();
+  await page.getByRole("button", { name: "Transitions", exact: true }).click();
+  await page.getByRole("button", {name:"Apply Crossfade transition",exact:true}).click();
   await expect(
-    page.getByText("已添加 0.50 秒叠化（后片段提前重叠）", { exact: true }),
+    page.getByText("Added a 0.50 sec crossfade (clips overlap)", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("button", { name: "文件菜单", exact: true }).click();
-  await page.getByRole("button", { name: "另存为", exact: false }).click();
+  await page.getByRole("button", { name: "File menu", exact: true }).click();
+  await page.getByRole("button", { name: "Save as…", exact: false }).click();
   await expect
     .poll(async () =>
       readFile(saved, "utf8")
@@ -174,9 +174,9 @@ try {
     .toBe(true);
   const previewPixel = await pixel();
   await page.screenshot({ path: path.join(output, "preview-midpoint.png") });
-  await page.getByRole("button", { name: "导出", exact: true }).click();
-  await page.getByRole("button", { name: "开始导出", exact: true }).click();
-  await expect(page.getByText("导出完成", { exact: true })).toBeVisible({
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await page.getByRole("button", { name: "Start export", exact: true }).click();
+  await expect(page.getByText("Export complete", { exact: true })).toBeVisible({
     timeout: 60_000,
   });
   const probe = await probeFile(exported);

@@ -38,10 +38,10 @@ export async function resolveMediaTool(
       return candidate;
     } catch { /* next candidate */ }
   }
-  if (override) throw new Error(`所选 ${name} 不可用，请在设置中重新选择可执行文件。`);
+  if (override) throw new Error(`The selected ${name} is unavailable. Choose the executable again in Settings.`);
   if (options.bundledDirectory)
-    throw new Error(`内置 ${name} 缺失或不可执行，请重新安装完整应用。`);
-  throw new Error(`找不到 ${name}。开发环境请安装 FFmpeg，或在设置中选择可执行文件。`);
+    throw new Error(`Built-in ${name} is missing or not executable. Reinstall the full app.`);
+  throw new Error(`Could not find ${name}. Install FFmpeg for development or choose an executable in Settings.`);
 }
 
 export function findMediaTool(name: ToolName): Promise<string> {

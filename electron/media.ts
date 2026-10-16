@@ -42,9 +42,9 @@ export async function runMediaTool(
   timeout = 60_000,
   limit = 16 * 1024 * 1024,
 ): Promise<Buffer> {
-  if (mediaShuttingDown) throw new Error("应用正在关闭。");
+  if (mediaShuttingDown) throw new Error("The app is closing.");
   const executable = await findMediaTool(name);
-  if (mediaShuttingDown) throw new Error("应用正在关闭。");
+  if (mediaShuttingDown) throw new Error("The app is closing.");
   // Local playlists and containers must never expand an import into HTTP/TCP/UDP requests.
   const localArgs =
     name === "ffprobe"
@@ -71,13 +71,13 @@ export async function runMediaTool(
     let diagnostic = "";
     let failure: Error | undefined;
     const timer = setTimeout(() => {
-      failure = new Error(`${name} 超时，请检查媒体是否损坏。`);
+      failure = new Error(`${name} timed out. Check whether the media file is damaged.`);
       child.kill("SIGKILL");
     }, timeout);
     child.stdout.on("data", (data: Buffer) => {
       bytes += data.length;
       if (bytes > limit) {
-        failure = new Error(`${name} 输出超过安全限制。`);
+        failure = new Error(`${name} output exceeded the safety limit.`);
         child.kill("SIGKILL");
       } else output.push(data);
     });
@@ -95,7 +95,7 @@ export async function runMediaTool(
       if (failure || code !== 0)
         reject(
           failure ??
-            new Error(`${name} 执行失败：${diagnostic.trim() || code}`),
+            new Error(`${name} failed: ${diagnostic.trim() || code}`),
         );
       else resolve(Buffer.concat(output));
     });
@@ -321,12 +321,12 @@ export async function importAssets(
   for (const supplied of paths) {
     const file = path.resolve(supplied);
     const metadata = await stat(file);
-    if (!metadata.isFile()) throw new Error(`无法导入目录：${file}`);
+    if (!metadata.isFile()) throw new Error(`Cannot import a folder: ${file}`);
     const probe = await probeFile(file);
     const video = probe.streams.find((s) => s.codec_type === "video");
     const audio = probe.streams.find((s) => s.codec_type === "audio");
     if (!video && !audio)
-      throw new Error(`没有可编辑的音视频流：${path.basename(file)}`);
+      throw new Error(`No editable audio or video stream found: ${path.basename(file)}`);
     const image = Boolean(
       video &&
       (/\b(image2|png_pipe|jpeg_pipe|webp_pipe|bmp_pipe|tiff_pipe)\b/.test(
@@ -342,7 +342,7 @@ export async function importAssets(
           Number(audio?.duration) || 0,
         );
     if (!image && duration <= 0)
-      throw new Error(`无法读取媒体时长：${path.basename(file)}`);
+      throw new Error(`Cannot read media duration: ${path.basename(file)}`);
     const rotation =
       video?.side_data_list?.find((s) => s.rotation !== undefined)?.rotation ??
       Number(video?.tags?.rotate ?? 0);
@@ -375,7 +375,7 @@ export async function importAssets(
     try {
       asset.previewUrl = await previewProxy(file, asset, probe, cacheDir, hash);
     } catch (error) {
-      asset.previewError = `无法生成本地预览代理：${error instanceof Error ? error.message : String(error)}`;
+      asset.previewError = `Cannot create a local preview proxy: ${error instanceof Error ? error.message : String(error)}`;
     }
     if (video) {
       const thumbnail = path.join(cacheDir, `${hash}.jpg`);

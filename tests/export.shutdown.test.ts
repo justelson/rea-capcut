@@ -25,6 +25,6 @@ it("drains an owned media process and prevents new workers during app shutdown",
   expect(await work).toBeInstanceOf(Error);
   expect(performance.now() - started).toBeLessThan(5000);
   await expect(runMediaTool("ffprobe", ["-version"])).rejects.toThrow(
-    "应用正在关闭",
+    "app is closing",
   );
 }, 10_000);

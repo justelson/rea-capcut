@@ -33,8 +33,8 @@ describe("subtitle batch edit workflow", () => {
   });
   it("fails the entire batch if any cue would go before zero or beyond 24 hours", () => {
     const p = fixture(), before = clone(p);
-    expect(() => prepareSubtitleEdit(p, ["cue-2", "cue-0"], { type: "offset", seconds: -3 })).toThrow("未修改任何字幕");
-    expect(() => prepareSubtitleEdit(p, ["cue-0", "cue-2"], { type: "offset", seconds: 86390 })).toThrow("范围");
+    expect(() => prepareSubtitleEdit(p, ["cue-2", "cue-0"], { type: "offset", seconds: -3 })).toThrow("No captions were changed");
+    expect(() => prepareSubtitleEdit(p, ["cue-0", "cue-2"], { type: "offset", seconds: 86390 })).toThrow("outside the timeline");
     expect(p).toEqual(before);
   });
   it("permits overlapping cues and frame-aligns nonzero absolute start/end edits", () => {
@@ -97,13 +97,13 @@ describe("subtitle batch edit workflow", () => {
   it("does not modify locked target tracks, including text-only edits", () => {
     const p = fixture(); p.tracks[0].locked = true;
     const edits: SubtitleEdit[] = [{ type: "offset", seconds: 1 }, { type: "replace", find: "字幕", replacement: "修改" }, { type: "style", referenceId: "title" }, { type: "cue", text: "修改", start: 2, end: 4 }];
-    for (const edit of edits) expect(() => prepareSubtitleEdit(p, ["cue-0"], edit)).toThrow("锁定");
+    for (const edit of edits) expect(() => prepareSubtitleEdit(p, ["cue-0"], edit)).toThrow("is locked");
   });
   it("rejects stale plans after edits or project switches and detaches committed data", () => {
     const p = fixture(), plan = prepareSubtitleEdit(p, ["cue-0"], { type: "offset", seconds: 1 });
     const changed = clone(p); changed.name = "别的编辑";
-    expect(() => applySubtitleEdit(changed, plan)).toThrow("项目已变化");
-    const another = clone(p); another.id = id(); expect(() => applySubtitleEdit(another, plan)).toThrow("项目已变化");
+    expect(() => applySubtitleEdit(changed, plan)).toThrow("project changed");
+    const another = clone(p); another.id = id(); expect(() => applySubtitleEdit(another, plan)).toThrow("project changed");
     const applied = applySubtitleEdit(p, plan); applied.clips[0].start = 25; expect(plan.project.clips[0].start).toBe(3);
   });
   it("commits multiple replacements as one undo/redo and leaves unrelated titles intact", () => {
@@ -127,6 +127,6 @@ describe("subtitle batch edit workflow", () => {
     const p = fixture();
     for (const ids of [[], ["cue-0", "cue-0"], ["cue-0", "title"], ["cue-0", "missing"]]) expect(() => prepareSubtitleEdit(p, ids, { type: "offset", seconds: 1 })).toThrow();
     p.clips[0].text!.text = "a".repeat(20000); validateProject(p);
-    expect(() => prepareSubtitleEdit(p, ["cue-0"], { type: "replace", find: "a", replacement: "aa" })).toThrow("20000");
+    expect(() => prepareSubtitleEdit(p, ["cue-0"], { type: "replace", find: "a", replacement: "aa" })).toThrow("20,000 characters");
   });
 });

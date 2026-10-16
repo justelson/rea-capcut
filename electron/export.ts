@@ -39,7 +39,7 @@ interface ExportJob {
 const jobs = new Map<string, ExportJob>();
 let exportsShuttingDown = false;
 const finite = (value: number, name: string): number => {
-  if (!Number.isFinite(value)) throw new Error(`${name} 必须是有限数值。`);
+  if (!Number.isFinite(value)) throw new Error(`${name} must be a finite number.`);
   return value;
 };
 const number = (value: number): string => Number(value.toFixed(6)).toString();
@@ -47,7 +47,7 @@ const color = (value: string): string => {
   if (/^#[\da-f]{6}([\da-f]{2})?$/i.test(value)) return `0x${value.slice(1)}`;
   if (/^(black|white|red|green|blue|transparent)$/i.test(value))
     return value === "transparent" ? "black@0" : value;
-  throw new Error(`不支持的颜色 ${value}，请使用 #RRGGBB 或 #RRGGBBAA。`);
+  throw new Error(`Unsupported color ${value}. Use #RRGGBB or #RRGGBBAA.`);
 };
 
 /** Keyframe time is in clip-local timeline seconds, including after a speed change. */
@@ -106,43 +106,43 @@ function tempoFilters(speed: number): string[] {
 }
 
 function validate(project: Project, options: ExportOptions): number {
-  if (!project.clips.length) throw new Error("时间线为空，请添加素材再导出。");
+  if (!project.clips.length) throw new Error("The timeline is empty. Add media before exporting.");
   if (!["mp4", "mov"].includes(options.format))
-    throw new Error("导出格式必须为 MP4 或 MOV。");
+    throw new Error("Export format must be MP4 or MOV.");
   if (!["draft", "standard", "high"].includes(options.quality))
-    throw new Error("未知导出质量。");
+    throw new Error("Unknown export quality.");
   for (const [value, name] of [
-    [options.width, "宽度"],
-    [options.height, "高度"],
+    [options.width, "Width"],
+    [options.height, "Height"],
   ] as const) {
     finite(value, name);
     if (value < 2 || value > 8192 || value % 2 || !Number.isInteger(value))
-      throw new Error(`${name} 必须为 2–8192 范围内的偶数。`);
+      throw new Error(`${name} must be an even number from 2 to 8192.`);
   }
   if (!Number.isFinite(options.fps) || options.fps < 1 || options.fps > 120)
-    throw new Error("帧率必须为 1–120。");
+    throw new Error("Frame rate must be between 1 and 120.");
   if (
     !Number.isFinite(project.width) ||
     !Number.isFinite(project.height) ||
     project.width <= 0 ||
     project.height <= 0
   )
-    throw new Error("工程画布尺寸无效。");
+    throw new Error("Invalid project canvas size.");
   if (!path.isAbsolute(options.path))
-    throw new Error("导出位置必须为绝对路径。");
+    throw new Error("Export location must be an absolute path.");
   if (
     project.assets.some(
       (asset) => path.resolve(asset.path) === path.resolve(options.path),
     )
   )
-    throw new Error("导出文件不能覆盖工程的源素材，请选择其他位置。");
+    throw new Error("The export cannot overwrite source media. Choose another location.");
   color(project.background);
   const range = resolveExportRange(project, options);
   const assets = new Map(project.assets.map((a) => [a.id, a]));
   const tracks = new Map(project.tracks.map((t) => [t.id, t]));
   for (const clip of project.clips) {
     if (!tracks.has(clip.trackId))
-      throw new Error(`片段 ${clip.name} 的轨道不存在。`);
+      throw new Error(`Track for clip ${clip.name} does not exist.`);
     for (const name of [
       "start",
       "duration",
@@ -164,7 +164,7 @@ function validate(project: Project, options: ExportOptions): number {
       clip.volume < 0 ||
       clip.volume > 4
     )
-      throw new Error(`片段 ${clip.name} 的时间、速度或音量超出支持范围。`);
+      throw new Error(`Time, speed, or volume for clip ${clip.name} is outside the supported range.`);
     for (const name of [
       "fadeIn",
       "fadeOut",
@@ -172,7 +172,7 @@ function validate(project: Project, options: ExportOptions): number {
       "audioFadeOut",
     ] as const)
       if (clip[name] < 0 || clip[name] > clip.duration)
-        throw new Error(`片段 ${clip.name} 的淡入淡出时长超出片段。`);
+        throw new Error(`Fade duration exceeds clip ${clip.name}.`);
     for (const [name, value] of Object.entries(clip.transform))
       if (typeof value === "number") finite(value, `${clip.name} ${name}`);
     if (
@@ -181,7 +181,7 @@ function validate(project: Project, options: ExportOptions): number {
       clip.transform.opacity < 0 ||
       clip.transform.opacity > 1
     )
-      throw new Error(`片段 ${clip.name} 的缩放或透明度无效。`);
+        throw new Error(`Invalid scale or opacity for clip ${clip.name}.`);
     for (const [name, value] of Object.entries(clip.adjustments))
       finite(value, `${clip.name} ${name}`);
     const a = clip.adjustments;
@@ -196,7 +196,7 @@ function validate(project: Project, options: ExportOptions): number {
       a.blur < 0 ||
       a.blur > 100
     )
-      throw new Error(`片段 ${clip.name} 的颜色调整超出支持范围。`);
+        throw new Error(`Color adjustment for clip ${clip.name} is outside the supported range.`);
     if (clip.crop) {
       const c = clip.crop;
       if (
@@ -208,7 +208,7 @@ function validate(project: Project, options: ExportOptions): number {
         c.x + c.width > 1 + 1e-9 ||
         c.y + c.height > 1 + 1e-9
       )
-        throw new Error("裁剪区域必须位于源画面内。");
+        throw new Error("Crop area must stay within the source frame.");
     }
     if (clip.chromaKey) {
       const key = clip.chromaKey;
@@ -222,7 +222,7 @@ function validate(project: Project, options: ExportOptions): number {
         key.blend < 0 ||
         key.blend > 1
       )
-        throw new Error("色度抠像参数无效。");
+        throw new Error("Invalid chroma key settings.");
     }
     if (clip.mask) {
       const mask = clip.mask;
@@ -237,7 +237,7 @@ function validate(project: Project, options: ExportOptions): number {
         mask.feather > 1 ||
         typeof mask.invert !== "boolean"
       )
-        throw new Error("蒙版参数无效。");
+        throw new Error("Invalid mask settings.");
     }
     if (clip.text) {
       if (
@@ -246,38 +246,38 @@ function validate(project: Project, options: ExportOptions): number {
         clip.text.fontSize > 1000 ||
         clip.text.text.length > 20_000
       )
-        throw new Error("文字字号或长度超出支持范围。");
+        throw new Error("Text size or length is outside the supported range.");
       if (
         !Number.isFinite(clip.text.strokeWidth) ||
         clip.text.strokeWidth < 0 ||
         clip.text.strokeWidth > 100
       )
-        throw new Error("文字描边宽度无效。");
+        throw new Error("Invalid text outline width.");
       color(clip.text.color);
       color(clip.text.stroke);
       if (clip.text.background !== "transparent") color(clip.text.background);
     } else {
       const asset = assets.get(clip.assetId ?? "");
-      if (!asset) throw new Error(`片段 ${clip.name} 找不到源素材。`);
-      if (asset.missing && clip.start < range.end && clip.start + clip.duration > range.start) throw new Error(`素材丢失：${asset.name}`);
+      if (!asset) throw new Error(`Source media for clip ${clip.name} was not found.`);
+      if (asset.missing && clip.start < range.end && clip.start + clip.duration > range.start) throw new Error(`Missing media: ${asset.name}`);
       if (
         asset.kind !== "image" &&
         clip.sourceIn + clip.duration * clip.speed > asset.duration + 0.08
       )
-        throw new Error(`片段 ${clip.name} 超出源素材时长，请缩短片段。`);
+        throw new Error(`Clip ${clip.name} exceeds the source duration. Shorten the clip.`);
     }
     if (clip.keyframes.length > 400)
-      throw new Error(`片段 ${clip.name} 的关键帧超过 400 个。`);
+      throw new Error(`Clip ${clip.name} has more than 400 keyframes.`);
     for (const key of clip.keyframes) {
-      finite(key.time, "关键帧时间");
-      finite(key.value, "关键帧数值");
+      finite(key.time, "Keyframe time");
+      finite(key.value, "Keyframe value");
       if (
         !["x", "y", "scale", "rotation", "opacity", "volume"].includes(
           key.property,
         ) ||
         !["linear", "easeInOut"].includes(key.easing)
       )
-        throw new Error("未知关键帧属性或插值方式。");
+        throw new Error("Unknown keyframe property or interpolation mode.");
       if (
         key.easingWindow &&
         (!Number.isFinite(key.easingWindow.start) ||
@@ -286,7 +286,7 @@ function validate(project: Project, options: ExportOptions): number {
           key.easingWindow.end > 1 ||
           key.easingWindow.end <= key.easingWindow.start)
       )
-        throw new Error("关键帧曲线窗口无效。");
+        throw new Error("Invalid keyframe curve window.");
       if (
         key.time < 0 ||
         key.time > clip.duration ||
@@ -294,7 +294,7 @@ function validate(project: Project, options: ExportOptions): number {
         (key.property === "opacity" && (key.value < 0 || key.value > 1)) ||
         (key.property === "volume" && (key.value < 0 || key.value > 4))
       )
-        throw new Error(`片段 ${clip.name} 的关键帧超出支持范围。`);
+        throw new Error(`Keyframes for clip ${clip.name} are outside the supported range.`);
     }
     for (const window of [clip.videoFadeWindow, clip.audioFadeWindow])
       if (window) {
@@ -313,11 +313,11 @@ function validate(project: Project, options: ExportOptions): number {
           window.fadeIn > window.duration ||
           window.fadeOut > window.duration
         )
-          throw new Error(`片段 ${clip.name} 的淡入淡出窗口无效。`);
+          throw new Error(`Invalid fade window for clip ${clip.name}.`);
       }
   }
   const duration = Math.max(...project.clips.map((c) => c.start + c.duration));
-  if (duration > 24 * 3600) throw new Error("单次导出最长支持 24 小时。");
+  if (duration > 24 * 3600) throw new Error("A single export can be up to 24 hours long.");
   return duration;
 }
 
@@ -347,7 +347,7 @@ async function renderText(
     Math.ceil(lineHeight * lines.length + padding * 2),
   );
   if (width > 8192 || height > 8192 || width * height > 32_000_000)
-    throw new Error("文字图层过大，请减少字号或文字长度。");
+    throw new Error("Text layer is too large. Reduce the font size or text length.");
   const canvas = createCanvas(width, height);
   const context = canvas.getContext("2d");
   if (style.background !== "transparent") {
@@ -388,7 +388,7 @@ async function renderMask(
   directory: string,
 ): Promise<string> {
   if (width * height > 64_000_000)
-    throw new Error("蒙版素材尺寸过大，请使用较小的源素材。");
+    throw new Error("Mask media is too large. Use a smaller source file.");
   const canvas = createCanvas(width, height);
   const context = canvas.getContext("2d");
   const pixels = context.createImageData(width, height);
@@ -476,7 +476,7 @@ export async function createExportArguments(
         const sourceWidth = text?.width ?? asset!.width;
         const sourceHeight = text?.height ?? asset!.height;
         if (!sourceWidth || !sourceHeight)
-          throw new Error(`无法确定素材 ${clip.name} 的尺寸。`);
+          throw new Error(`Cannot determine the dimensions of media clip ${clip.name}.`);
         const crop = getCropPixels(
           { width: sourceWidth, height: sourceHeight },
           clip.crop,
@@ -713,11 +713,11 @@ export async function startExport(
   options: ExportOptions,
   onProgress: (progress: ExportProgress) => void,
 ): Promise<{ jobId: string }> {
-  if (exportsShuttingDown) throw new Error("应用正在关闭。");
+  if (exportsShuttingDown) throw new Error("The app is closing.");
   validate(project, options);
   const duration = resolveExportRange(project, options).duration;
   const executable = await findMediaTool("ffmpeg");
-  if (exportsShuttingDown) throw new Error("应用正在关闭。");
+  if (exportsShuttingDown) throw new Error("The app is closing.");
   const outputIdentity = await realpath(options.path).catch(() =>
     path.resolve(options.path),
   );
@@ -727,14 +727,14 @@ export async function startExport(
     ),
   );
   if (sourceIdentities.includes(outputIdentity))
-    throw new Error("导出文件不能覆盖工程的源素材，请选择其他位置。");
+    throw new Error("The export cannot overwrite source media. Choose another location.");
   await mkdir(path.dirname(options.path), { recursive: true });
-  if (exportsShuttingDown) throw new Error("应用正在关闭。");
+  if (exportsShuttingDown) throw new Error("The app is closing.");
   const jobId = randomUUID();
   const directory = await mkdtemp(path.join(tmpdir(), "reacut-export-"));
   if (exportsShuttingDown) {
     await rm(directory, { recursive: true, force: true });
-    throw new Error("应用正在关闭。");
+    throw new Error("The app is closing.");
   }
   let finish!: () => void;
   const finished = new Promise<void>((resolve) => {
@@ -816,7 +816,7 @@ export async function startExport(
           if (job.cancelled) resolve();
           else if (code === 0) resolve();
           else
-            reject(new Error(`FFmpeg 导出失败：${diagnostic.trim() || code}`));
+            reject(new Error(`FFmpeg export failed: ${diagnostic.trim() || code}`));
         });
       });
       if (job.cancelled) {

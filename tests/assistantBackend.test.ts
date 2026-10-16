@@ -66,8 +66,8 @@ describe("assistant CLI isolation and protocol", () => {
     const providers = await discoverAssistantProviders({ codex: fixture, claude: fixture });
     expect(providers.map(p => p.available)).toEqual([true, true]);
     expect(providers[0].version).toBe("fixture 1.0");
-    await expect(resolveAssistantExecutable("codex", folder)).rejects.toThrow("不是可执行文件");
-    await expect(resolveAssistantExecutable("codex", "codex")).rejects.toThrow("不是可执行文件");
+    await expect(resolveAssistantExecutable("codex", folder)).rejects.toThrow("not an executable");
+    await expect(resolveAssistantExecutable("codex", "codex")).rejects.toThrow("not an executable");
   });
   it.each(["codex", "claude"] as const)("streams %s, uses stdin, and removes its private working folder", async provider => {
     const input = request(provider);
@@ -92,8 +92,8 @@ describe("assistant CLI isolation and protocol", () => {
     expect([...codex, ...claude].some(value => /dangerously|bypassPermissions|full-auto/.test(value))).toBe(false);
   });
   it.each([
-    ["CASE_LOGIN", "登录"], ["CASE_BADJSON", "无效"], ["CASE_NULL", "无效"], ["CASE_NOFINISH", "完整回复"],
-    ["CASE_FLOOD", "超出限制"], ["CASE_TOOL", "工具"], ["CASE_POLICY", "拒绝"],
+    ["CASE_LOGIN", "signed out"], ["CASE_BADJSON", "invalid event data"], ["CASE_NULL", "invalid event data"], ["CASE_NOFINISH", "incomplete response"],
+    ["CASE_FLOOD", "exceeded the limit"], ["CASE_TOOL", "outside edit proposals"], ["CASE_POLICY", "declined this request"],
   ])("fails closed for %s", async (testCase, expected) => {
     const events = await run("codex", testCase);
     expect(events.at(-1)).toMatchObject({ type: "error", message: expect.stringContaining(expected) });
@@ -102,7 +102,7 @@ describe("assistant CLI isolation and protocol", () => {
   });
   it("times out and cleans up", async () => {
     const events = await run("codex", "CASE_HANG", 100);
-    expect(events.at(-1)).toMatchObject({ type: "error", message: expect.stringContaining("超时") });
+    expect(events.at(-1)).toMatchObject({ type: "error", message: expect.stringContaining("timed out") });
   });
   it("cancels a running child and does not return a proposal", async () => {
     const events: AssistantEvent[] = [];
@@ -120,8 +120,8 @@ describe("assistant input and response boundaries", () => {
       expect(() => validateAssistantRequest({ ...request(), context: JSON.stringify(context) })).toThrow();
   });
   it("bounds requests and roles", () => {
-    expect(() => validateAssistantRequest({ ...request(), prompt: "x".repeat(8001) })).toThrow("过长");
-    expect(() => validateAssistantRequest({ ...request(), history: Array(21).fill({ role: "user", content: "hi" }) })).toThrow("历史");
+    expect(() => validateAssistantRequest({ ...request(), prompt: "x".repeat(8001) })).toThrow("too long");
+    expect(() => validateAssistantRequest({ ...request(), history: Array(21).fill({ role: "user", content: "hi" }) })).toThrow("history");
     expect(() => validateAssistantRequest({ ...request(), requestId: "bad\nrequest" })).toThrow();
     expect(() => validateAssistantRequest({ ...request(), context: "null" })).toThrow();
   });

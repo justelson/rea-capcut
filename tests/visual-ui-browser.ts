@@ -61,23 +61,23 @@ try {
   await page.goto("http://127.0.0.1:5182/visual-ui");
   await page.waitForSelector(".visual-tools");
   await expect(
-    page.getByRole("spinbutton", { name: "裁剪宽度" }),
+    page.getByRole("spinbutton", { name: "Crop width" }),
   ).toBeDisabled();
   assert.equal((await state()).project.clips[0].crop, undefined);
-  await page.getByRole("checkbox", { name: "启用画面裁剪" }).check();
-  await page.getByRole("combobox", { name: "裁剪比例" }).selectOption("1:1");
+  await page.getByRole("checkbox", { name: "Enable crop" }).check();
+  await page.getByRole("combobox", { name: "Crop ratio" }).selectOption("1:1");
   assert.deepEqual((await state()).project.clips[0].crop, {
     x: 0.25,
     y: 0,
     width: 0.5,
     height: 1,
   });
-  const width = page.getByRole("spinbutton", { name: "裁剪宽度" });
+  const width = page.getByRole("spinbutton", { name: "Crop width" });
   await expect(width).toHaveAttribute("min", "1");
   await width.fill("0");
   await width.blur();
   assert.equal((await state()).project.clips[0].crop.width, 0.01);
-  await page.getByRole("combobox", { name: "裁剪比例" }).selectOption("1:1");
+  await page.getByRole("combobox", { name: "Crop ratio" }).selectOption("1:1");
   const past = (await state()).past.length;
   await width.focus();
   for (const value of ["45", "40", "35", "30"]) await width.fill(value);
@@ -88,33 +88,33 @@ try {
     "several edits while focused must produce one undo step",
   );
   assert.equal((await state()).project.clips[0].crop.width, 0.3);
-  await page.getByRole("spinbutton", { name: "左侧位置" }).fill("95");
-  await page.getByRole("spinbutton", { name: "左侧位置" }).blur();
+  await page.getByRole("spinbutton", { name: "Left position" }).fill("95");
+  await page.getByRole("spinbutton", { name: "Left position" }).blur();
   assert.equal(
     (await state()).project.clips[0].crop.x,
     0.7,
     "invalid source overflow must be clamped",
   );
-  await page.getByRole("button", { name: "重置为完整画面" }).click();
+  await page.getByRole("button", { name: "Reset to full frame" }).click();
   assert.equal((await state()).project.clips[0].crop, undefined);
-  await page.getByRole("button", { name: "抠像", exact: true }).click();
-  await expect(page.getByRole("slider", { name: "颜色容差" })).toBeDisabled();
-  await page.getByRole("checkbox", { name: "启用色度抠像" }).check();
-  await page.getByRole("button", { name: "蓝幕", exact: true }).click();
+  await page.getByRole("button", { name: "Chroma key", exact: true }).click();
+  await expect(page.getByRole("slider", { name: "Color tolerance" })).toBeDisabled();
+  await page.getByRole("checkbox", { name: "Enable chroma key" }).check();
+  await page.getByRole("button", { name: "Blue screen", exact: true }).click();
   assert.equal((await state()).project.clips[0].chromaKey.color, "#0000ff");
-  await page.getByRole("button", { name: "清除色度抠像" }).click();
+  await page.getByRole("button", { name: "Clear chroma key" }).click();
   assert.equal((await state()).project.clips[0].chromaKey, undefined);
-  await page.getByRole("button", { name: "蒙版", exact: true }).click();
-  await page.getByRole("checkbox", { name: "启用形状蒙版" }).check();
-  const maskWidth = page.getByRole("spinbutton", { name: "蒙版宽度" });
+  await page.getByRole("button", { name: "Mask", exact: true }).click();
+  await page.getByRole("checkbox", { name: "Enable shape mask" }).check();
+  const maskWidth = page.getByRole("spinbutton", { name: "Mask width" });
   await expect(maskWidth).toHaveAttribute("min", "1");
   await maskWidth.fill("0");
   await maskWidth.blur();
   assert.equal((await state()).project.clips[0].mask.width, 0.01);
-  await page.getByRole("button", { name: "椭圆", exact: true }).click();
-  await page.getByRole("spinbutton", { name: "蒙版宽度" }).fill("60");
-  await page.getByRole("spinbutton", { name: "蒙版宽度" }).blur();
-  await page.getByRole("checkbox", { name: "反选蒙版" }).check();
+  await page.getByRole("button", { name: "Ellipse", exact: true }).click();
+  await page.getByRole("spinbutton", { name: "Mask width" }).fill("60");
+  await page.getByRole("spinbutton", { name: "Mask width" }).blur();
+  await page.getByRole("checkbox", { name: "Invert mask" }).check();
   assert.deepEqual((await state()).project.clips[0].mask, {
     shape: "ellipse",
     width: 0.6,
@@ -122,12 +122,12 @@ try {
     feather: 0,
     invert: true,
   });
-  await page.getByRole("button", { name: "锁定", exact: true }).click();
+  await page.getByRole("button", { name: "Lock", exact: true }).click();
   await expect(
-    page.getByRole("checkbox", { name: "启用形状蒙版" }),
+    page.getByRole("checkbox", { name: "Enable shape mask" }),
   ).toBeDisabled();
-  await expect(page.getByRole("button", { name: "清除蒙版" })).toBeDisabled();
-  await page.getByRole("button", { name: "锁定", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Clear mask" })).toBeDisabled();
+  await page.getByRole("button", { name: "Lock", exact: true }).click();
   assert.deepEqual(errors, []);
   mkdirSync("docs/screenshots", { recursive: true });
   await page.screenshot({

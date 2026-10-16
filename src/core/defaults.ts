@@ -16,7 +16,7 @@ export const DEFAULT_ADJUSTMENTS: Adjustments = {
   blur: 0,
 };
 export const DEFAULT_TEXT: TextStyle = {
-  text: "在这里输入文字",
+  text: "Type your text here",
   fontSize: 72,
   fontFamily: "Noto Sans SC",
   color: "#ffffff",

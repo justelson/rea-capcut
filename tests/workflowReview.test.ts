@@ -17,7 +17,7 @@ async function fixture() {
   const project = createProject("搬移回归");
   project.assets = [{ id: "asset", name: "自造图片", kind: "image", path: source, url: "file://" + source, duration: 0, width: 160, height: 90, fps: 0, hasAudio: false }];
   project.clips = [createClip(project.assets[0], project.tracks[1].id, 0, 30)];
-  const folder = await collectPortableProject(project, parent, new AbortController().signal, () => {}), file = path.join(folder, "项目.reacut");
+  const folder = await collectPortableProject(project, parent, new AbortController().signal, () => {}), file = path.join(folder, "project.reacut");
   const opened = await resolvePortableDocument(JSON.parse(await readFile(file, "utf8")), file);
   return { root, folder, file, opened };
 }

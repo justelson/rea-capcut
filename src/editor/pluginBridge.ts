@@ -34,8 +34,8 @@ export function installPluginBridge() {
     if (request.action === 'state') return snapshot();
     if (request.action === 'catalog') return { assets: BUILTIN_ASSETS };
     if (request.action === 'edit') {
-      if (!Number.isInteger(a.revision) || a.revision !== revision) throw new Error('项目已变化，请重新读取状态后再编辑');
-      if (s.transactionOpen) throw new Error('用户正在拖动或调整参数，请稍后重试');
+      if (!Number.isInteger(a.revision) || a.revision !== revision) throw new Error('The project changed. Read its current state before editing.');
+      if (s.transactionOpen) throw new Error('The user is dragging or adjusting a setting. Try again shortly.');
       const result = previewAssistantEdits(s.project, a.actions);
       s.commit(result.project);
       return { ...snapshot(), changes: result.descriptions };
@@ -52,12 +52,12 @@ export function installPluginBridge() {
       else if (a.command === 'play') s.setPlaying(true);
       else if (a.command === 'pause') s.setPlaying(false);
       else if (a.command === 'seek') {
-        if (typeof a.time !== 'number' || !Number.isFinite(a.time) || a.time < 0 || a.time > projectDuration(s.project)) throw new Error('无效播放位置');
+        if (typeof a.time !== 'number' || !Number.isFinite(a.time) || a.time < 0 || a.time > projectDuration(s.project)) throw new Error('Invalid playhead position.');
         s.seek(a.time);
-      } else throw new Error('不支持的编辑器操作');
+      } else throw new Error('Unsupported editor operation.');
       return snapshot();
     }
-    throw new Error('不支持的插件操作');
+    throw new Error('Unsupported plugin operation.');
   });
 }
 

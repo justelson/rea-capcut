@@ -117,7 +117,7 @@ async function contactSheet(assets: readonly BuiltinAsset[], name: string, headi
   const ctx = canvas.getContext("2d");
   ctx.fillStyle = "#11181f"; ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "#eaf5f3"; ctx.font = 'bold 32px "Noto Sans SC"'; ctx.fillText(heading, margin, 48);
-  ctx.fillStyle = "#93a6b4"; ctx.font = '16px "Noto Sans SC"'; ctx.fillText(`${assets.length} 款 · 程序绘制 / 合成 · MIT 许可 · 本地可用`, margin, 78);
+  ctx.fillStyle = "#93a6b4"; ctx.font = '16px "Noto Sans SC"'; ctx.fillText(`${assets.length} assets · generated / synthetic · MIT licensed · available offline`, margin, 78);
   for (const [index, asset] of assets.entries()) {
     const x = margin + index % columns * cellWidth, y = 104 + Math.floor(index / columns) * cellHeight;
     const width = cellWidth - 16, height = 148;
@@ -142,10 +142,10 @@ async function contactSheet(assets: readonly BuiltinAsset[], name: string, headi
       }
     }
     ctx.fillStyle = "#eaf5f3"; ctx.font = '18px "Noto Sans SC"'; ctx.fillText(asset.name, x, y + 175);
-    ctx.fillStyle = "#8ba0ae"; ctx.font = '12px "Noto Sans SC"'; ctx.fillText(asset.kind === "audio" ? `WAV · ${asset.duration}s` : asset.category === "stickers" ? "PNG + SVG · 透明贴纸" : asset.category === "titles" ? "PNG + SVG · 透明底板" : "PNG + SVG · 1920 × 1080", x, y + 194);
+    ctx.fillStyle = "#8ba0ae"; ctx.font = '12px "Noto Sans SC"'; ctx.fillText(asset.kind === "audio" ? `WAV · ${asset.duration}s` : asset.category === "stickers" ? "PNG + SVG · transparent sticker" : asset.category === "titles" ? "PNG + SVG · transparent title plate" : "PNG + SVG · 1920 × 1080", x, y + 194);
   }
   await mkdir(path.resolve("docs/screenshots"), { recursive: true });
   await writeFile(path.resolve("docs/screenshots", name), canvas.toBuffer("image/png"));
 }
-await contactSheet(BUILTIN_ASSETS, "original-assets-contact.png", "ReaCut · 离线素材库");
-await contactSheet(BUILTIN_ASSETS.slice(34), "new-assets-contact.png", "ReaCut · 新增灵感素材");
+await contactSheet(BUILTIN_ASSETS, "original-assets-contact.png", "ReaCut · Offline Media Library");
+await contactSheet(BUILTIN_ASSETS.slice(34), "new-assets-contact.png", "ReaCut · New Creative Assets");

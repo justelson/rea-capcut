@@ -156,7 +156,7 @@ try {
     )
     .toBe(true);
   const divider = page.getByRole("separator", {
-    name: "调整时间线高度",
+    name: "Adjust timeline height",
     exact: true,
   });
   await expect(divider).toHaveCount(1);
@@ -180,9 +180,9 @@ try {
     path: path.join(root, "docs", "screenshots", "demo-editor.png"),
   });
   await page.screenshot({ path: path.join(output, "editor.png") });
-  await page.getByRole("button", { name: "导出", exact: true }).click();
-  await page.getByRole("button", { name: "开始导出", exact: true }).click();
-  await expect(page.getByText("导出完成", { exact: true })).toBeVisible({
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await page.getByRole("button", { name: "Start export", exact: true }).click();
+  await expect(page.getByText("Export complete", { exact: true })).toBeVisible({
     timeout: 120000,
   });
   const rendered = await probeFile(exported);
@@ -216,7 +216,7 @@ try {
       "isolated sandbox bridge",
       "startup .reacut argument",
       "real landscape preview and thumbnails",
-      "UI export with Chinese titles and mixed audio",
+      "UI export with English sample titles and mixed audio",
     ],
     errors,
   };

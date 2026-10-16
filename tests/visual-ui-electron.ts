@@ -53,7 +53,7 @@ try {
         return {
           canceled: false,
           filePath:
-            options.title === "导出视频"
+            options.title === "Export video"
               ? files.directory +
                 "/render-" +
                 (g.__visualRenderIndex = (g.__visualRenderIndex ?? 0) + 1) +
@@ -93,7 +93,7 @@ try {
     const previous = await stat(projectPath)
       .then((s) => s.mtimeMs)
       .catch(() => -1);
-    await page!.getByRole("button", { name: "保存项目", exact: true }).click();
+    await page!.getByRole("button", { name: "Save project", exact: true }).click();
     await expect
       .poll(() =>
         stat(projectPath)
@@ -146,12 +146,12 @@ try {
     return Array.from(buffer.subarray(0, 3));
   };
   const render = async () => {
-    await page!.getByRole("button", { name: "导出", exact: true }).click();
-    await page!.getByRole("button", { name: "开始导出", exact: true }).click();
-    await expect(page!.getByText("导出完成", { exact: true })).toBeVisible({
+    await page!.getByRole("button", { name: "Export", exact: true }).click();
+    await page!.getByRole("button", { name: "Start export", exact: true }).click();
+    await expect(page!.getByText("Export complete", { exact: true })).toBeVisible({
       timeout: 120_000,
     });
-    await page!.getByRole("button", { name: "完成", exact: true }).click();
+    await page!.getByRole("button", { name: "Done", exact: true }).click();
     const file = path.join(directory, `render-${++renderIndex}.mp4`);
     const metadata = await probeFile(file);
     assert.equal(
@@ -161,9 +161,9 @@ try {
     return file;
   };
   // Keep preview and export comparisons deterministic at a small native canvas size.
-  await page.getByRole("spinbutton", { name: "宽度", exact: true }).fill("320");
-  await page.getByRole("spinbutton", { name: "高度", exact: true }).fill("180");
-  await page.getByRole("spinbutton", { name: "高度", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Width", exact: true }).fill("320");
+  await page.getByRole("spinbutton", { name: "Height", exact: true }).fill("180");
+  await page.getByRole("spinbutton", { name: "Height", exact: true }).blur();
   await page.locator(".media-import").click();
   await expect(page.locator(".media-item")).toHaveCount(2);
   let project = await save();
@@ -171,21 +171,21 @@ try {
   await expect(page.locator(".tl-clip")).toHaveCount(1);
   await page
     .locator(".inspector-tabs")
-    .getByRole("button", { name: "裁剪", exact: true })
+    .getByRole("button", { name: "Crop", exact: true })
     .click();
   await expect(
-    page.getByRole("spinbutton", { name: "裁剪宽度", exact: true }),
+    page.getByRole("spinbutton", { name: "Crop width", exact: true }),
   ).toBeDisabled();
   await page
-    .getByRole("checkbox", { name: "启用画面裁剪", exact: true })
+    .getByRole("checkbox", { name: "Enable crop", exact: true })
     .check();
   await expect(
-    page.getByRole("spinbutton", { name: "裁剪宽度", exact: true }),
+    page.getByRole("spinbutton", { name: "Crop width", exact: true }),
   ).toHaveAttribute("min", "1");
   await page
-    .getByRole("spinbutton", { name: "裁剪宽度", exact: true })
+    .getByRole("spinbutton", { name: "Crop width", exact: true })
     .fill("0");
-  await page.getByRole("spinbutton", { name: "裁剪宽度", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Crop width", exact: true }).blur();
   project = await save();
   assert.equal(
     project.clips[0].crop?.width,
@@ -193,12 +193,12 @@ try {
     "Crop input minimum must remain valid for project saving",
   );
   await page
-    .getByRole("spinbutton", { name: "裁剪宽度", exact: true })
+    .getByRole("spinbutton", { name: "Crop width", exact: true })
     .fill("50");
   await page
-    .getByRole("spinbutton", { name: "裁剪高度", exact: true })
+    .getByRole("spinbutton", { name: "Crop height", exact: true })
     .fill("50");
-  await page.getByRole("spinbutton", { name: "裁剪高度", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Crop height", exact: true }).blur();
   project = await save();
   assert.deepEqual(project.clips[0].crop, {
     x: 0,
@@ -213,25 +213,25 @@ try {
     "UI crop must survive actual video export",
   );
   await page
-    .getByRole("button", { name: "重置为完整画面", exact: true })
+    .getByRole("button", { name: "Reset to full frame", exact: true })
     .click();
   project = await save();
   assert.equal(project.clips[0].crop, undefined);
   await page
     .locator(".inspector-tabs")
-    .getByRole("button", { name: "蒙版", exact: true })
+    .getByRole("button", { name: "Mask", exact: true })
     .click();
   await page
-    .getByRole("checkbox", { name: "启用形状蒙版", exact: true })
+    .getByRole("checkbox", { name: "Enable shape mask", exact: true })
     .check();
-  await page.getByRole("button", { name: "椭圆", exact: true }).click();
+  await page.getByRole("button", { name: "Ellipse", exact: true }).click();
   await expect(
-    page.getByRole("spinbutton", { name: "蒙版宽度", exact: true }),
+    page.getByRole("spinbutton", { name: "Mask width", exact: true }),
   ).toHaveAttribute("min", "1");
   await page
-    .getByRole("spinbutton", { name: "蒙版宽度", exact: true })
+    .getByRole("spinbutton", { name: "Mask width", exact: true })
     .fill("0");
-  await page.getByRole("spinbutton", { name: "蒙版宽度", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Mask width", exact: true }).blur();
   project = await save();
   assert.equal(
     project.clips[0].mask?.width,
@@ -239,12 +239,12 @@ try {
     "Mask minimum must remain valid for saving",
   );
   await page
-    .getByRole("spinbutton", { name: "蒙版宽度", exact: true })
+    .getByRole("spinbutton", { name: "Mask width", exact: true })
     .fill("50");
   await page
-    .getByRole("spinbutton", { name: "蒙版高度", exact: true })
+    .getByRole("spinbutton", { name: "Mask height", exact: true })
     .fill("50");
-  await page.getByRole("spinbutton", { name: "蒙版高度", exact: true }).blur();
+  await page.getByRole("spinbutton", { name: "Mask height", exact: true }).blur();
   project = await save();
   assert.deepEqual(project.clips[0].mask, {
     shape: "ellipse",
@@ -254,7 +254,7 @@ try {
     invert: false,
   });
   await expect.poll(async () => black(await pixel(0.2, 0.5))).toBe(true);
-  await page.getByRole("checkbox", { name: "反选蒙版", exact: true }).check();
+  await page.getByRole("checkbox", { name: "Invert mask", exact: true }).check();
   await expect.poll(async () => black(await pixel())).toBe(true);
   project = await save();
   assert.equal(project.clips[0].mask?.invert, true);
@@ -263,18 +263,18 @@ try {
     black(await exportedPixel(maskRender, 160, 90)),
     "Inverted mask must preserve center transparency in export",
   );
-  await page.getByRole("button", { name: "清除蒙版", exact: true }).click();
+  await page.getByRole("button", { name: "Clear mask", exact: true }).click();
   project = await save();
   assert.equal(project.clips[0].mask, undefined);
-  await page.getByRole("button", { name: "删除选中片段", exact: true }).click();
+  await page.getByRole("button", { name: "Delete selected clips", exact: true }).click();
   await page.locator(`[data-asset-id="${project.assets[1].id}"]`).dblclick();
   await expect.poll(async () => green(await pixel(0.2, 0.5))).toBe(true);
   await page
     .locator(".inspector-tabs")
-    .getByRole("button", { name: "抠像", exact: true })
+    .getByRole("button", { name: "Chroma key", exact: true })
     .click();
   await page
-    .getByRole("checkbox", { name: "启用色度抠像", exact: true })
+    .getByRole("checkbox", { name: "Enable chroma key", exact: true })
     .check();
   project = await save();
   assert.equal(project.clips[0].chromaKey?.color, "#00ff00");
@@ -292,15 +292,15 @@ try {
   // A disabled track must also disable all feature controls.
   const track = project.tracks.find((t) => t.id === project.clips[0].trackId)!;
   await page
-    .getByRole("button", { name: `锁定${track.name}`, exact: true })
+    .getByRole("button", { name: `Lock ${track.name}`, exact: true })
     .click();
   await expect(
-    page.getByRole("checkbox", { name: "启用色度抠像", exact: true }),
+    page.getByRole("checkbox", { name: "Enable chroma key", exact: true }),
   ).toBeDisabled();
   await page
-    .getByRole("button", { name: `解锁${track.name}`, exact: true })
+    .getByRole("button", { name: `Unlock ${track.name}`, exact: true })
     .click();
-  await page.getByRole("button", { name: "清除色度抠像", exact: true }).click();
+  await page.getByRole("button", { name: "Clear chroma key", exact: true }).click();
   project = await save();
   assert.equal(project.clips[0].chromaKey, undefined);
   await expect.poll(async () => green(await pixel(0.2, 0.5))).toBe(true);

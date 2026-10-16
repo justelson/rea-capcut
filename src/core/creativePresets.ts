@@ -11,7 +11,7 @@ import {
 export interface TextPreset {
   id: string;
   name: string;
-  category: "标题" | "字幕" | "标记" | "动态";
+  category: "Title" | "Captions" | "Labels" | "Motion";
   style: Partial<TextStyle> & { text: string };
   y?: number;
   motion?: "rise" | "pop" | "fade";
@@ -19,16 +19,16 @@ export interface TextPreset {
 export const TEXT_PRESETS: readonly TextPreset[] = [
   {
     id: "classic",
-    name: "经典标题",
-    category: "标题",
-    style: { text: "让灵感，成为画面", fontSize: 80 },
+    name: "Classic title",
+    category: "Title",
+    style: { text: "Turn ideas into images", fontSize: 80 },
   },
   {
     id: "chapter",
-    name: "章节标题",
-    category: "标题",
+    name: "Chapter title",
+    category: "Title",
     style: {
-      text: "CHAPTER 01\n我的故事",
+      text: "CHAPTER 01\nMy story",
       fontSize: 66,
       color: "#ffd69a",
       strokeWidth: 0,
@@ -36,10 +36,10 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "cinema",
-    name: "电影片名",
-    category: "标题",
+    name: "Film title",
+    category: "Title",
     style: {
-      text: "在路上\nA JOURNEY",
+      text: "On the road\nA JOURNEY",
       fontSize: 90,
       color: "#fff0d5",
       strokeWidth: 0,
@@ -47,10 +47,10 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "editorial",
-    name: "极简刊头",
-    category: "标题",
+    name: "Minimal masthead",
+    category: "Title",
     style: {
-      text: "生活观察\nVOL. 01",
+      text: "Life in view\nVOL. 01",
       fontSize: 70,
       bold: false,
       strokeWidth: 0,
@@ -58,11 +58,11 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "subtitle",
-    name: "字幕底条",
-    category: "字幕",
+    name: "Caption bar",
+    category: "Captions",
     y: 0.36,
     style: {
-      text: "每一帧，都值得记录",
+      text: "Every frame is worth remembering",
       fontSize: 52,
       bold: false,
       background: "#11151c",
@@ -71,18 +71,18 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "outline",
-    name: "清晰描边",
-    category: "字幕",
+    name: "Clean outline",
+    category: "Captions",
     y: 0.36,
-    style: { text: "给平凡的一天，加一点光", fontSize: 54, strokeWidth: 4 },
+    style: { text: "Add a little light to an ordinary day", fontSize: 54, strokeWidth: 4 },
   },
   {
     id: "warm-caption",
-    name: "暖白旁白",
-    category: "字幕",
+    name: "Warm narration",
+    category: "Captions",
     y: 0.32,
     style: {
-      text: "慢慢走，沿途都有风景",
+      text: "Take it slow. There is beauty along the way.",
       fontSize: 48,
       bold: false,
       color: "#fff0d5",
@@ -92,10 +92,10 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "quote",
-    name: "访谈引用",
-    category: "字幕",
+    name: "Interview quote",
+    category: "Captions",
     style: {
-      text: "“把热爱，写进每一天。”",
+      text: "“Make room for what you love, every day.”",
       fontSize: 64,
       color: "#a0f1df",
       strokeWidth: 0,
@@ -103,16 +103,16 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "mint",
-    name: "薄荷标记",
-    category: "标记",
+    name: "Mint label",
+    category: "Labels",
     style: { text: "REACUT", fontSize: 104, color: "#62ead1", strokeWidth: 0 },
   },
   {
     id: "comic",
-    name: "漫画强调",
-    category: "标记",
+    name: "Comic emphasis",
+    category: "Labels",
     style: {
-      text: "精彩来了！",
+      text: "Here comes the good part!",
       fontSize: 100,
       color: "#ffd176",
       stroke: "#382637",
@@ -121,11 +121,11 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "news",
-    name: "资讯快报",
-    category: "标记",
+    name: "News flash",
+    category: "Labels",
     y: 0.29,
     style: {
-      text: "现场直击 · 最新动态",
+      text: "Live update · Just in",
       fontSize: 60,
       background: "#b63f43",
       strokeWidth: 0,
@@ -133,11 +133,11 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "label",
-    name: "人物姓名牌",
-    category: "标记",
+    name: "Name tag",
+    category: "Labels",
     y: 0.3,
     style: {
-      text: "林间 · 创作者",
+      text: "Your name · Creator",
       fontSize: 52,
       color: "#15252c",
       background: "#62ead1",
@@ -146,25 +146,25 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "rise",
-    name: "轻盈升起",
-    category: "动态",
+    name: "Gentle rise",
+    category: "Motion",
     motion: "rise",
-    style: { text: "新的故事，现在开始", fontSize: 74, strokeWidth: 0 },
+    style: { text: "A new story starts now", fontSize: 74, strokeWidth: 0 },
   },
   {
     id: "pop",
-    name: "弹跳登场",
-    category: "动态",
+    name: "Bouncy entrance",
+    category: "Motion",
     motion: "pop",
     style: { text: "HELLO！", fontSize: 108, color: "#ffd176", strokeWidth: 4 },
   },
   {
     id: "fade",
-    name: "柔光开场",
-    category: "动态",
+    name: "Soft glow intro",
+    category: "Motion",
     motion: "fade",
     style: {
-      text: "遇见，美好的一刻",
+      text: "Meet a beautiful moment",
       fontSize: 72,
       bold: false,
       color: "#fff0d5",
@@ -173,11 +173,11 @@ export const TEXT_PRESETS: readonly TextPreset[] = [
   },
   {
     id: "end",
-    name: "温柔谢幕",
-    category: "动态",
+    name: "Gentle outro",
+    category: "Motion",
     motion: "fade",
     style: {
-      text: "感谢观看\n下次再见",
+      text: "Thanks for watching\nSee you next time",
       fontSize: 76,
       color: "#a0f1df",
       strokeWidth: 0,
@@ -261,18 +261,18 @@ export function addTextPreset(
   };
 }
 export const MOTION_PRESETS = [
-  { id: "push", name: "缓慢推进", description: "从当前缩放缓慢推近，突出主体" },
-  { id: "pull", name: "镜头拉远", description: "从近景拉回当前画面" },
-  { id: "pan-left", name: "向左漫游", description: "轻微横移，适合照片与风景" },
+  { id: "push", name: "Slow push-in", description: "Slowly zoom in from the current scale to emphasize the subject." },
+  { id: "pull", name: "Pull back", description: "Pull back from a close-up to the current framing." },
+  { id: "pan-left", name: "Pan left", description: "A subtle horizontal pan for photos and landscapes." },
   {
     id: "pan-right",
-    name: "向右漫游",
-    description: "轻微横移，适合照片与风景",
+    name: "Pan right",
+    description: "A subtle horizontal pan for photos and landscapes.",
   },
-  { id: "float", name: "轻盈漂浮", description: "上下缓缓浮动" },
-  { id: "pulse", name: "呼吸缩放", description: "两次柔和放大与回落" },
-  { id: "sway", name: "轻轻摇摆", description: "小角度左右摆动" },
-  { id: "shake", name: "节奏震动", description: "短促横向震动后恢复原位" },
+  { id: "float", name: "Gentle float", description: "Drift slowly up and down." },
+  { id: "pulse", name: "Breathing zoom", description: "Two soft zooms with a gentle return." },
+  { id: "sway", name: "Gentle sway", description: "A small side-to-side rotation." },
+  { id: "shake", name: "Rhythmic shake", description: "A quick horizontal shake, then return to center." },
 ] as const;
 export type MotionId = (typeof MOTION_PRESETS)[number]["id"];
 export function motionPatch(
@@ -352,51 +352,51 @@ export function motionPatch(
 export const TRANSITION_PRESETS = [
   {
     id: "dissolve",
-    name: "叠化",
-    description: "两段画面柔和交融",
-    category: "基础",
+    name: "Crossfade",
+    description: "Blend two clips smoothly.",
+    category: "Basic",
   },
   {
     id: "dip",
-    name: "经过背景",
-    description: "淡至画布背景，再进入下一段",
-    category: "基础",
+    name: "Dip to color",
+    description: "Fade through the canvas background into the next clip.",
+    category: "Basic",
   },
   {
     id: "slide-left",
-    name: "向左滑入",
-    description: "后片段从右侧滑入",
-    category: "运镜",
+    name: "Slide left",
+    description: "The next clip slides in from the right.",
+    category: "Camera movement",
   },
   {
     id: "slide-right",
-    name: "向右滑入",
-    description: "后片段从左侧滑入",
-    category: "运镜",
+    name: "Slide right",
+    description: "The next clip slides in from the left.",
+    category: "Camera movement",
   },
   {
     id: "slide-up",
-    name: "向上滑入",
-    description: "后片段从下侧滑入",
-    category: "运镜",
+    name: "Slide up",
+    description: "The next clip slides in from below.",
+    category: "Camera movement",
   },
   {
     id: "slide-down",
-    name: "向下滑入",
-    description: "后片段从上侧滑入",
-    category: "运镜",
+    name: "Slide down",
+    description: "The next clip slides in from above.",
+    category: "Camera movement",
   },
   {
     id: "zoom",
-    name: "缩放交接",
-    description: "后片段由小变大并淡入",
-    category: "动感",
+    name: "Zoom handoff",
+    description: "The next clip grows into view as it fades in.",
+    category: "Motion",
   },
   {
     id: "spin",
-    name: "旋转交接",
-    description: "后片段轻旋转、放大并淡入",
-    category: "动感",
+    name: "Spin handoff",
+    description: "The next clip rotates, grows, and fades in.",
+    category: "Motion",
   },
 ] as const;
 export type TransitionId = (typeof TRANSITION_PRESETS)[number]["id"];
@@ -460,12 +460,12 @@ export function applyTransition(
     !Number.isFinite(seconds) ||
     seconds <= 0
   )
-    throw new Error("转场参数无效");
+    throw new Error("Invalid transition settings.");
   const front = project.clips.find((c) => c.id === clipId),
     track = project.tracks.find((t) => t.id === front?.trackId);
   if (!front || !track || front.text || track.kind === "audio")
-    throw new Error("请选择一个画面片段");
-  if (track.locked) throw new Error("请先解锁轨道");
+    throw new Error("Select a video clip.");
+  if (track.locked) throw new Error("Unlock the track first.");
   const siblings = project.clips
     .filter((c) => c.trackId === track.id)
     .sort((a, b) => a.start - b.start);
@@ -479,11 +479,11 @@ export function applyTransition(
     next.start > end + tolerance ||
     next.start < end - front.duration / 2 - 0.00001
   )
-    throw new Error("需要同轨相邻的两个画面片段；请先消除间隙或过大的重叠");
+    throw new Error("This needs two adjacent video clips on the same track. Remove the gap or reduce the overlap first.");
   const limit = Math.min(5, front.duration / 2, next.duration / 2);
   const duration =
     Math.floor(Math.min(seconds, limit) * project.fps + 1e-8) / project.fps;
-  if (duration < 1 / project.fps) throw new Error("片段太短，无法添加转场");
+  if (duration < 1 / project.fps) throw new Error("The clip is too short for a transition.");
   const newStart = snapToFrame(
     end - (transition === "dip" ? 0 : duration),
     project.fps,
@@ -492,7 +492,7 @@ export function applyTransition(
     siblings[index + 2] &&
     newStart + next.duration > siblings[index + 2].start + 0.00001
   )
-    throw new Error("转场会与后续片段重叠；请先为后片段留出空间");
+    throw new Error("The transition would overlap the following clip. Make room first.");
   let incoming: Clip = {
     ...next,
     start: newStart,

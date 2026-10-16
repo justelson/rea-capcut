@@ -68,45 +68,47 @@ describe("independently verified local draft envelope", () => {
 
   it("rejects JSON primitives, arrays and malformed apparent JSON", () => {
     for (const value of ["null", "true", "123", '"text"', "[]"])
-      expect(() => decodeCapcutDraft(value)).toThrow("JSON 对象");
-    expect(() => decodeCapcutDraft("{broken")).toThrow("无法解析");
-    expect(() => decodeCapcutDraft("[broken")).toThrow("无法解析");
+      expect(() => decodeCapcutDraft(value)).toThrow("JSON object");
+    expect(() => decodeCapcutDraft("{broken")).toThrow("parse");
+    expect(() => decodeCapcutDraft("[broken")).toThrow("parse");
   });
 
   it("authenticates both ciphertext and embedded material rather than guessing plaintext", () => {
     const changedBody = knownCarrier.slice(0, -10) +
       (knownCarrier.at(-10) === "A" ? "B" : "A") + knownCarrier.slice(-9);
-    expect(() => decodeCapcutDraft(changedBody)).toThrow("认证失败");
+    expect(() => decodeCapcutDraft(changedBody)).toThrow("authentication failed");
     expect(() => decodeCapcutDraft("1" + knownCarrier.slice(1))).toThrow(
-      "认证失败",
+      "authentication failed",
     );
     expect(() => decodeCapcutDraft(knownCarrier.slice(0, -4))).toThrow();
   });
 
   it("rejects unknown, too-short, non-ASCII and malformed Base64 carriers explicitly", () => {
     for (const source of ["", "opaque-unrecognized", knownCarrier.slice(0, 100)])
-      expect(() => decodeCapcutDraft(source)).toThrow("不透明");
+      expect(() => decodeCapcutDraft(source)).toThrow("opaque payload");
     expect(() => decodeCapcutDraft("中" + knownCarrier.slice(1))).toThrow(
-      "不透明",
+      "identify the embedded ASCII format",
     );
     expect(() =>
       decodeCapcutDraft(knownCarrier.slice(0, 140) + "!" + knownCarrier.slice(141)),
-    ).toThrow("不透明");
+    ).toThrow("identify the Base64 format");
     expect(() =>
       decodeCapcutDraft(knownCarrier.slice(0, 140) + "\n" + knownCarrier.slice(141)),
-    ).toThrow("不透明");
+    ).toThrow("identify the Base64 format");
   });
 
   it("requires canonical padding bits and standard rather than URL-safe Base64", () => {
     // Changing the final U to V changes only unused padding bits. Permissive
     // Buffer decoding produces the same bytes; canonical round-trip rejects it.
     expect(() => decodeCapcutDraft(knownCarrier.slice(0, -2) + "V=")).toThrow(
-      "不规范",
+      "invalid Base64",
     );
     expect(() => decodeCapcutDraft(knownCarrier.replace("+", "-"))).toThrow(
-      "不透明",
+      "identify the Base64 format",
     );
-    expect(() => decodeCapcutDraft(knownCarrier + "=")).toThrow("不透明");
+    expect(() => decodeCapcutDraft(knownCarrier + "=")).toThrow(
+      "identify the Base64 format",
+    );
   });
 
   it("validates UTF-8 and object JSON only after successful authentication", () => {
@@ -115,12 +117,12 @@ describe("independently verified local draft envelope", () => {
     expect(() => decodeCapcutDraft(neutralCarrier(invalidUtf8))).toThrow("UTF-8");
     expect(() =>
       decodeCapcutDraft(neutralCarrier(JSON.stringify("x".repeat(180)))),
-    ).toThrow("JSON 对象");
+    ).toThrow("JSON object");
     expect(() =>
       decodeCapcutDraft(neutralCarrier(JSON.stringify(["x".repeat(180)]))),
-    ).toThrow("JSON 对象");
+    ).toThrow("JSON object");
     expect(() => decodeCapcutDraft(neutralCarrier("x".repeat(180)))).toThrow(
-      "无法解析",
+      "parse",
     );
   });
 

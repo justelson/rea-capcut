@@ -31,11 +31,11 @@ it("keeps an explicit user override ahead of the bundled tool", async () => {
 });
 it("reports a damaged bundle instead of silently using system tools", async () => {
   await expect(resolveMediaTool("ffprobe", { platform: "darwin", bundledDirectory: path.join(directory, "missing"), env: { PATH: system } }))
-    .rejects.toThrow("内置 ffprobe");
+    .rejects.toThrow("Built-in ffprobe");
 });
 it("does not hide a stale explicit override with the bundled tool", async () => {
   await expect(resolveMediaTool("ffmpeg", { platform: "darwin", bundledDirectory, env: { REACUT_FFMPEG: directory } }))
-    .rejects.toThrow("所选 ffmpeg");
+    .rejects.toThrow("selected ffmpeg");
 });
 it("retains PATH discovery for source development", async () => {
   const executable = process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg";

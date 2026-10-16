@@ -2,6 +2,7 @@ name: Windows preview
 
 on:
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: read
@@ -40,6 +41,25 @@ jobs:
         run: npm run demo
       - name: Verify packaged app, preview and real video export
         run: npx tsx tests/package-electron.ts
+      - name: Verify English product flows and native title bar
+        run: npx tsx tests/english-window-electron.ts
+      - name: Build immutable 0.5.0 fork source for visual comparison
+        shell: pwsh
+        run: |
+          git fetch origin 21a4a3afa269c9ad9b8717330da630da601ce3f3 --depth=1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach .test-output/baseline-source 21a4a3afa269c9ad9b8717330da630da601ce3f3
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          New-Item -ItemType Junction -Path .test-output/baseline-source/node_modules -Target (Join-Path $env:GITHUB_WORKSPACE node_modules)
+          Push-Location .test-output/baseline-source
+          npm run build
+          $buildExit = $LASTEXITCODE
+          Pop-Location
+          exit $buildExit
+      - name: Capture matching historical window
+        env:
+          REACUT_BASELINE_SOURCE: .test-output/baseline-source
+        run: npx tsx tests/capture-baseline-electron.ts
       - name: Upload packaged-app evidence
         if: always()
         uses: actions/upload-artifact@v7
@@ -47,7 +67,13 @@ jobs:
           name: Windows-packaged-app-evidence
           if-no-files-found: warn
           retention-days: 14
-          path: .test-output/package-electron/
+          path: |
+            .test-output/package-electron/evidence.json
+            .test-output/package-electron/editor.png
+            .test-output/package-electron/failure.png
+            .test-output/package-electron/packaged-demo.mp4
+            .test-output/english-window/*.png
+            .test-output/english-window/evidence.json
       - name: Record source and checksums
         shell: pwsh
         run: |

@@ -72,7 +72,7 @@ describe("experimental classic plaintext import", () => {
       transform: { x: 96, y: 108, opacity: 0.5 },
     });
     expect(project.clips[1].text?.text).toBe("中文字幕");
-    expect(warnings.some((w) => w.includes("实验性"))).toBe(true);
+    expect(warnings.some((w) => w.includes("Experimental import"))).toBe(true);
     expect(() => validateProject(project)).not.toThrow();
   });
   it("infers an original canvas from an imported visual clip before mapping positions", () => {
@@ -98,7 +98,7 @@ describe("experimental classic plaintext import", () => {
     expect(result.project).toMatchObject({ width: 640, height: 360 });
     expect(result.project.clips[0].transform).toMatchObject({ x: 160, y: -90 });
     expect(result.project.clips[1].transform).toMatchObject({ x: 32, y: 36 });
-    expect(result.warnings.some((w) => w.includes("推断为 640 × 360"))).toBe(
+    expect(result.warnings.some((w) => w.includes("Inferred 640 × 360"))).toBe(
       true,
     );
     expect(() => validateProject(result.project)).not.toThrow();
@@ -111,7 +111,7 @@ describe("experimental classic plaintext import", () => {
     const result = importCapcutDraft(d);
     expect(result.project).toMatchObject({ width: 1080, height: 1920 });
     expect(result.project.clips[0].transform).toMatchObject({ x: 54, y: 192 });
-    expect(result.warnings.some((w) => w.includes("画布尺寸"))).toBe(false);
+    expect(result.warnings.some((w) => w.includes("canvas size"))).toBe(false);
     d.canvas_config = { width: 10000, height: 1 };
     expect(importCapcutDraft(d).project).toMatchObject({
       width: 7680,
@@ -124,7 +124,7 @@ describe("experimental classic plaintext import", () => {
     d.materials.videos[0].height = 0;
     const result = importCapcutDraft({ ...d, canvas_config: undefined });
     expect(result.project).toMatchObject({ width: 1920, height: 1080 });
-    expect(result.warnings.some((w) => w.includes("默认 1920 × 1080"))).toBe(
+    expect(result.warnings.some((w) => w.includes("Using 1920 × 1080"))).toBe(
       true,
     );
     expect(() => validateProject(result.project)).not.toThrow();
@@ -161,7 +161,7 @@ describe("experimental classic plaintext import", () => {
       Object.assign(d.materials.videos[0], change);
       const result = importCapcutDraft(d);
       expect(result.project).toMatchObject({ width: 1920, height: 1080 });
-      expect(result.warnings.some((w) => w.includes("默认 1920 × 1080"))).toBe(
+      expect(result.warnings.some((w) => w.includes("Using 1920 × 1080"))).toBe(
         true,
       );
       expect(() => validateProject(result.project)).not.toThrow();
@@ -188,13 +188,13 @@ describe("experimental classic plaintext import", () => {
     const result = importCapcutDraft(d);
     expect(result.project).toMatchObject({ width: 640, height: 360 });
     expect(result.project.clips).toHaveLength(2);
-    expect(result.warnings.some((w) => w.includes("本机绝对路径"))).toBe(true);
+    expect(result.warnings.some((w) => w.includes("local absolute path"))).toBe(true);
   });
   it("requires desktop envelope decoding before schema conversion", () => {
-    expect(() => importCapcutDraft("opaque-base64-carrier")).toThrow("不透明");
-    expect(() => importCapcutDraft("{bad")).toThrow("无法解析");
+    expect(() => importCapcutDraft("opaque-base64-carrier")).toThrow("opaque payload");
+    expect(() => importCapcutDraft("{bad")).toThrow("parse the CapCut draft JSON");
     expect(() => importCapcutDraft({ tracks: [], materials: [] })).toThrow(
-      "需要 tracks",
+      "must contain tracks and materials",
     );
   });
   it("accepts observed sparse empty modern timelines but rejects malformed ones", () => {
@@ -210,7 +210,7 @@ describe("experimental classic plaintext import", () => {
       { id: undefined }, { version: undefined }, { new_version: undefined },
       { duration: 1 }, { duration: "invalid" }, { tracks: null },
       { materials: { videos: [{ id: "unaccounted" }] } },
-    ]) expect(() => importCapcutDraft({ ...empty, ...change })).toThrow("需要 tracks");
+    ]) expect(() => importCapcutDraft({ ...empty, ...change })).toThrow("must contain tracks and materials");
   });
   it("puts higher native track layers above video and uses the observed empty canvas background", () => {
     const d = draft();
@@ -229,21 +229,21 @@ describe("experimental classic plaintext import", () => {
     } });
     const result = importCapcutDraft(d);
     expect(result.project.clips[0]).toMatchObject({ volume: 4, transform: { scale: 10, opacity: 1 } });
-    for (const word of ["音量超出", "缩放超出", "透明度超出"])
+    for (const word of ["volume is outside", "scale is outside", "opacity is outside"])
       expect(result.warnings.some(w => w.includes(word))).toBe(true);
-    expect(result.warnings.some(w => w.includes("非等比"))).toBe(false);
+    expect(result.warnings.some(w => w.includes("Non-uniform scaling"))).toBe(false);
   });
   it("skips unsupported/network paths and impossible source ranges with warnings", () => {
     const d = draft();
     d.materials.videos[0].path = "https://example.com/private.mp4";
     const remote = importCapcutDraft(d);
     expect(remote.project.clips).toHaveLength(1);
-    expect(remote.warnings.some((w) => w.includes("本机绝对路径"))).toBe(true);
+    expect(remote.warnings.some((w) => w.includes("local absolute path"))).toBe(true);
     d.materials.videos[0].path = "/tmp/test.mp4";
     d.materials.videos[0].duration = 3_000_000;
     const impossible = importCapcutDraft(d);
     expect(impossible.project.clips).toHaveLength(1);
-    expect(impossible.warnings.some((w) => w.includes("源素材时长"))).toBe(
+    expect(impossible.warnings.some((w) => w.includes("source media duration"))).toBe(
       true,
     );
   });
@@ -275,7 +275,7 @@ describe("experimental classic plaintext import", () => {
     d.materials.videos[0].path = "C:\\素材\\测试.mp4";
     const result = importCapcutDraft(d);
     expect(result.project.assets[0].path).toBe(d.materials.videos[0].path);
-    expect(result.warnings.some((w) => w.includes("样式"))).toBe(true);
+    expect(result.warnings.some((w) => w.includes("styles"))).toBe(true);
   });
   it("bounds pathological input and skips nonpositive timeline ranges", () => {
     const d = draft();
@@ -283,6 +283,6 @@ describe("experimental classic plaintext import", () => {
     expect(importCapcutDraft(d).project.clips).toHaveLength(1);
     expect(() =>
       importCapcutDraft({ tracks: Array(1001).fill({}), materials: {} }),
-    ).toThrow("轨道数量");
+    ).toThrow("track import limit");
   });
 });

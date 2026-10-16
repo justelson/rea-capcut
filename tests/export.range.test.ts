@@ -13,7 +13,7 @@ afterAll(async()=>{await rm(directory,{recursive:true,force:true});});
 const baseProject=()=>{const p=createProject('区间');const c=createClip(undefined,p.tracks[0].id,0,30);c.duration=4;p.clips=[c];return p;};
 describe('export range',()=>{
  it.each([{start:-1,end:2},{start:2,end:1},{start:0,end:8},{start:0,end:0},{start:NaN,end:2},{start:0,end:Infinity},{start:1,end:1.001},null,'bad'])('rejects invalid range %j',range=>{
-  expect(()=>resolveExportRange(baseProject(),{fps:30,range:range as any})).toThrow('区间');
+  expect(()=>resolveExportRange(baseProject(),{fps:30,range:range as any})).toThrow('export range');
  });
  it('selects the bounding interval, preserving gaps and overlapping tracks',()=>{
   const p=baseProject();p.clips.push({...p.clips[0],id:'other',start:8,duration:2});
@@ -49,7 +49,7 @@ describe('export range',()=>{
   const asset={id:'missing',name:'outside',path:path.join(directory,'absent.mp4'),url:'file:///absent.mp4',kind:'video' as const,duration:2,width:160,height:90,fps:30,hasAudio:false,missing:true};
   p.assets=[asset];p.clips.push({...createClip(asset,p.tracks.find(t=>t.kind==='video')!.id,5,30),duration:2});
   const result=await render(p,'outside',{start:0,end:1});expect(result).toContain('outside.mp4');
-  await expect(render(p,'missing-range',{start:5,end:6})).rejects.toThrow('素材丢失');
+  await expect(render(p,'missing-range',{start:5,end:6})).rejects.toThrow('Missing media');
  },20000);
 });
 async function render(project:Project,name:string,range?:ExportOptions['range']):Promise<string>{

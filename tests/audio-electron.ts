@@ -47,7 +47,7 @@ const saveProject = async (): Promise<Project> => {
   const before = await stat(saved)
     .then((value) => value.mtimeMs)
     .catch(() => -1);
-  await page.getByRole("button", { name: "保存项目", exact: true }).click();
+  await page.getByRole("button", { name: "Save project", exact: true }).click();
   await expect
     .poll(
       async () =>
@@ -108,9 +108,9 @@ try {
       (dialog as any).showOpenDialog = async (...args: any[]) => {
         const options = args[args.length - 1];
         const file =
-          options.title === "导入素材"
+          options.title === "Import media"
             ? files.source
-            : options.title === "打开 ReaCut 项目"
+            : options.title === "Open ReaCut project"
               ? files.saved
               : files.replacement;
         return { canceled: false, filePaths: [file] };
@@ -161,7 +161,7 @@ try {
       return rgba[0] > 220 && rgba[1] < 30 && rgba[2] < 30;
     })
     .toBe(true);
-  await page.getByRole("button", { name: "分离音频", exact: true }).click();
+  await page.getByRole("button", { name: "Separate audio", exact: true }).click();
   await expect(page.locator(".tl-clip")).toHaveCount(2);
   await expect(page.locator(".media-item")).toHaveCount(2);
   let project = await saveProject();
@@ -186,7 +186,7 @@ try {
       .locator(`[data-clip-id="${audioClip.id}"]`)
       .click({ position: { x: 25, y: 26 } });
     await page.keyboard.press("Home");
-    await page.getByRole("button", { name: "播放", exact: true }).click();
+    await page.getByRole("button", { name: "Play", exact: true }).click();
     await expect
       .poll(
         async () =>
@@ -209,14 +209,14 @@ try {
     assert.equal(original.gain, 0);
     assert(original.rms < 0.001);
     assert(separated.gain > 0.99);
-    await page.getByRole("button", { name: "暂停", exact: true }).click();
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
     return levels;
   };
   const levelsBeforeMove = await playAndMeasure();
 
   await rename(source, replacement);
-  await page.getByRole("button", { name: "文件菜单", exact: true }).click();
-  await page.getByRole("button", { name: "打开项目", exact: false }).click();
+  await page.getByRole("button", { name: "File menu", exact: true }).click();
+  await page.getByRole("button", { name: "Open project", exact: false }).click();
   await expect(page.locator(".media-item.is-missing")).toHaveCount(2, {
     timeout: 30_000,
   });
@@ -224,7 +224,7 @@ try {
   await page
     .locator(`[data-asset-id="${audioAsset.id}"]`)
     .click({ button: "right" });
-  await page.getByRole("button", { name: "重新链接素材", exact: true }).click();
+  await page.getByRole("button", { name: "Relink media", exact: true }).click();
   await expect(page.locator(".media-item.is-missing")).toHaveCount(0, {
     timeout: 30_000,
   });
@@ -265,12 +265,12 @@ try {
   const levelsAfterMove = await playAndMeasure();
 
   await page.keyboard.press("Escape");
-  await page.getByRole("spinbutton", { name: "宽度", exact: true }).fill("320");
-  await page.getByRole("spinbutton", { name: "高度", exact: true }).fill("180");
-  await page.getByRole("spinbutton", { name: "高度", exact: true }).blur();
-  await page.getByRole("button", { name: "导出", exact: true }).click();
-  await page.getByRole("button", { name: "开始导出", exact: true }).click();
-  await expect(page.getByText("导出完成", { exact: true })).toBeVisible({
+  await page.getByRole("spinbutton", { name: "Width", exact: true }).fill("320");
+  await page.getByRole("spinbutton", { name: "Height", exact: true }).fill("180");
+  await page.getByRole("spinbutton", { name: "Height", exact: true }).blur();
+  await page.getByRole("button", { name: "Export", exact: true }).click();
+  await page.getByRole("button", { name: "Start export", exact: true }).click();
+  await expect(page.getByText("Export complete", { exact: true })).toBeVisible({
     timeout: 60_000,
   });
   const probe = await probeFile(exported);

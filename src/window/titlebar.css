@@ -1,0 +1,78 @@
+.titlebar {
+  height: 44px;
+  margin-inline: -8px;
+  width: calc(100% + 16px);
+  padding: 0;
+  display: block;
+  position: relative;
+  background: #151515;
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.titlebar-content {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto minmax(120px, 1fr) auto;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  column-gap: 14px;
+  padding-inline: 12px;
+}
+
+.titlebar[data-platform="win32"] .titlebar-content,
+.titlebar[data-platform="linux"] .titlebar-content {
+  margin-left: env(titlebar-area-x, 0px);
+  width: env(titlebar-area-width, calc(100% - 138px));
+}
+
+.titlebar[data-platform="darwin"] .titlebar-content {
+  padding-left: 84px;
+}
+
+.titlebar .project-title {
+  position: static;
+  transform: none;
+  justify-self: center;
+  width: 100%;
+  max-width: 300px;
+  min-width: 0;
+}
+
+.titlebar .project-title input {
+  min-width: 0;
+  width: 100%;
+  user-select: text;
+}
+
+.titlebar .titlebar-actions {
+  margin-left: 0;
+  white-space: nowrap;
+}
+
+.titlebar :is(button, input, select, a, [role="menu"], .file-menu, .titlebar-menus) {
+  -webkit-app-region: no-drag;
+}
+
+@media (max-width: 1250px) {
+  .titlebar-content {
+    column-gap: 8px;
+  }
+  .titlebar .offline-pill {
+    display: none;
+  }
+}
+
+@media (max-width: 1100px) {
+  .titlebar-content {
+    column-gap: 6px;
+    padding-inline: 10px;
+  }
+  .titlebar .brand strong {
+    display: none;
+  }
+  .titlebar .titlebar-actions {
+    gap: 2px;
+  }
+}
